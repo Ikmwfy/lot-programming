@@ -128,6 +128,38 @@ with col2:
         centroid = poly_geom.centroid
         area = poly_geom.area
 
+        # ================== PETA SATELIT ==================
+
+st.subheader("🛰️ Paparan Satellite Lot Tanah")
+
+center_lat = centroid.y
+center_lon = centroid.x
+
+m = folium.Map(
+    location=[center_lat, center_lon],
+    zoom_start=18,
+    tiles=None
+)
+
+folium.TileLayer(
+    tiles="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+    attr="Esri",
+    name="Satellite"
+).add_to(m)
+
+folium.Polygon(
+    locations=[(n, e) for e, n in coords],
+    color="yellow",
+    weight=3,
+    fill=True,
+    fill_opacity=0.3
+).add_to(m)
+
+minimap = MiniMap(toggle_display=True, position="bottomright")
+m.add_child(minimap)
+
+st_folium(m, width=900, height=500)
+
         # --- PENYEDIAAN DATA QGIS ---
         poly_feature = {"type": "Feature", "properties": {"Jenis": "Kawasan", "Luas_m2": round(area, 3)}, "geometry": poly_geom.__geo_interface__}
         line_feature = {"type": "Feature", "properties": {"Jenis": "Sempadan"}, "geometry": line_geom.__geo_interface__}
@@ -143,55 +175,6 @@ with col2:
         col3.metric("Bilangan Stesen", len(df))
         col4.metric("Status", "Tutup" if poly_geom.is_valid else "Ralat")
 
-  try:
-    # ================== BACA DATA ==================
-
-    coords = list(zip(df['E'], df['N']))
-    poly_geom = Polygon(coords)
-    line_geom = LineString(coords + [coords[0]])
-    centroid = poly_geom.centroid
-    area = poly_geom.area
-
-    # ================== PETA SATELIT ==================
-
-    st.subheader("🛰️ Paparan Satellite Lot Tanah")
-
-    center_lat = centroid.y
-    center_lon = centroid.x
-
-    m = folium.Map(
-        location=[center_lat, center_lon],
-        zoom_start=18,
-        tiles=None
-    )
-
-    folium.TileLayer(
-        tiles="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-        attr="Esri",
-        name="Satellite"
-    ).add_to(m)
-
-    folium.Polygon(
-        locations=[(n, e) for e, n in coords],
-        color="yellow",
-        weight=3,
-        fill=True,
-        fill_opacity=0.3
-    ).add_to(m)
-
-    # ================== MINI MAP ==================
-
-    minimap = MiniMap(toggle_display=True, position="bottomright")
-    m.add_child(minimap)
-
-    st_folium(m, width=900, height=500)
-
-    # ================== PAPAR PLOT ==================
-
-    st.pyplot(fig)
-
-except Exception as e:
-    st.error(f"❌ Ralat: {e}")
 
         # ================== PLOT (MATPLOTLIB) ==================
         if plot_theme == "Dark Mode":
@@ -260,6 +243,7 @@ except Exception as e:
     except Exception as e:
 
         st.error(f"❌ Ralat: Sila pastikan format CSV betul (E, N, STN). Ralat teknikal: {e}")
+
 
 
 
