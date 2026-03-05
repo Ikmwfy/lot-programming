@@ -63,33 +63,58 @@ def format_dms(decimal_degree):
     return f"{d}°{abs(m):02d}'{abs(int(s)):02d}\""
 
 
-# ================== LOGIN FUNCTION ==================
+# ================== FUNGSI LOGIN ==================
 def check_password():
 
-    if "login_status" not in st.session_state:
-        st.session_state.login_status = False
+    USER_ID = "1"
+    USER_PASS = "admin123"
 
-    if st.session_state.login_status:
+    # ================== STYLE LOGIN ==================
+    st.markdown("""
+    <style>
+    .login-title {
+        text-align:center;
+        font-size:40px;
+        font-weight:bold;
+        margin-bottom:30px;
+    }
+    .login-box {
+        background-color:#0f172a;
+        padding:40px;
+        border-radius:15px;
+        width:450px;
+        margin:auto;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+    # Tajuk
+    st.markdown('<div class="login-title">🔐 Sistem Survey Lot PUO</div>', unsafe_allow_html=True)
+
+    # Ruang login
+    col1, col2, col3 = st.columns([1,2,1])
+
+    with col2:
+
+        user_id = st.text_input("👤 Masukkan ID")
+        password = st.text_input("🔑 Masukkan Kata Laluan", type="password")
+
+        login_button = st.button("Log Masuk", use_container_width=True)
+
+        if login_button:
+            if user_id == USER_ID and password == USER_PASS:
+                st.session_state["login_success"] = True
+                st.rerun()
+            else:
+                st.error("ID atau Kata Laluan Salah")
+
+        st.markdown("<br>", unsafe_allow_html=True)
+        st.button("❓ Lupa Kata Laluan?", use_container_width=True)
+
+    if "login_success" in st.session_state and st.session_state["login_success"]:
         return True
-
-    st.markdown('<div class="login-box">', unsafe_allow_html=True)
-
-    st.markdown('<div class="title">🔐 Sistem Survey Lot PUO</div>', unsafe_allow_html=True)
-
-    user_id = st.text_input("Masukkan ID")
-
-    if st.button("Log Masuk"):
-
-        if user_id in users:
-            st.session_state.login_status = True
-            st.session_state.nama = users[user_id]["nama"]
-            st.rerun()
-        else:
-            st.error("ID tidak wujud")
-
-    st.markdown('</div>', unsafe_allow_html=True)
-
-    return False
+    else:
+        return False
 
 
 # ================== MAIN APP ==================
@@ -241,3 +266,4 @@ if check_password():
 
     except Exception as e:
         st.error(f"❌ Ralat: Sila pastikan format CSV betul (E, N, STN). Ralat teknikal: {e}")
+
