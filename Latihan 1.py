@@ -102,9 +102,10 @@ def check_password():
         login_button = st.button("Log Masuk", use_container_width=True)
 
         if login_button:
-            if user_id == USER_ID and password == USER_PASS:
-                st.session_state["login_success"] = True
-                st.rerun()
+           if user_id == USER_ID and password == USER_PASS:
+    st.session_state["login_success"] = True
+    st.session_state["nama"] = "Admin PUO"
+    st.rerun()
             else:
                 st.error("ID atau Kata Laluan Salah")
 
@@ -266,4 +267,5 @@ if check_password():
 
     except Exception as e:
         st.error(f"❌ Ralat: Sila pastikan format CSV betul (E, N, STN). Ralat teknikal: {e}")
+
 
