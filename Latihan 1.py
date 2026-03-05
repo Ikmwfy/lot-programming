@@ -6,55 +6,6 @@ from shapely.geometry import Polygon, Point, LineString
 import json
 import os
 
-# ================= CONFIG PAGE =================
-st.set_page_config(page_title="Visualisasi Poligon Pro", layout="wide")
-
-# ================== DATA AHLI ==================
-
-users = {
-    "1": {
-        "nama": "Ikmal Wafiy",
-        "password": "admin123"
-    },
-    "2": {
-        "nama": "Ahmad",
-        "password": "admin123"
-    },
-    "3": {
-        "nama": "Siti",
-        "password": "admin123"
-    }
-}
-
-st.markdown("""
-<style>
-
-.stApp{
-background: linear-gradient(to bottom,#020617,#000000);
-color:white;
-}
-
-.login-box{
-width:600px;
-margin:auto;
-margin-top:120px;
-}
-
-.title{
-text-align:center;
-font-size:42px;
-font-weight:700;
-margin-bottom:40px;
-}
-
-button[kind="primary"]{
-width:100%;
-border-radius:10px;
-}
-
-</style>
-""", unsafe_allow_html=True)
-
 # ================== FUNGSI TUKAR DMS ==================
 def format_dms(decimal_degree):
     d = int(decimal_degree)
@@ -62,66 +13,97 @@ def format_dms(decimal_degree):
     s = round((((decimal_degree - d) * 60) - m) * 60, 0)
     return f"{d}°{abs(m):02d}'{abs(int(s)):02d}\""
 
-
 # ================== FUNGSI LOGIN ==================
 def check_password():
 
     USER_ID = "1"
     USER_PASS = "admin123"
 
-    # ================== STYLE LOGIN ==================
     st.markdown("""
     <style>
-    .login-title {
-        text-align:center;
-        font-size:40px;
-        font-weight:bold;
-        margin-bottom:30px;
+
+    .stApp{
+        background-color:#0b1220;
     }
-    .login-box {
+
+    .title{
+        text-align:center;
+        font-size:42px;
+        font-weight:700;
+        color:white;
+        margin-bottom:40px;
+    }
+
+    .login-box{
+        max-width:700px;
+        margin:auto;
         background-color:#0f172a;
         padding:40px;
-        border-radius:15px;
-        width:450px;
-        margin:auto;
+        border-radius:12px;
+        box-shadow:0px 0px 20px rgba(0,0,0,0.5);
     }
+
+    div[data-testid="stTextInput"] input{
+        background-color:#1e293b;
+        color:white;
+        border-radius:10px;
+        border:1px solid #334155;
+        height:45px;
+    }
+
+    div[data-testid="stButton"] button{
+        height:45px;
+        border-radius:10px;
+        font-weight:600;
+        background-color:#111827;
+        color:white;
+        border:1px solid #334155;
+    }
+
+    div[data-testid="stButton"] button:hover{
+        border:1px solid #6366f1;
+    }
+
     </style>
     """, unsafe_allow_html=True)
 
-    # Tajuk
-    st.markdown('<div class="login-title">🔐 Sistem Survey Lot PUO</div>', unsafe_allow_html=True)
+    st.markdown('<div class="title">🔐 Sistem Survey Lot PUO</div>', unsafe_allow_html=True)
 
-    # Ruang login
-    col1, col2, col3 = st.columns([1,2,1])
+    col1,col2,col3 = st.columns([1,2,1])
 
     with col2:
 
-        user_id = st.text_input("👤 Masukkan ID")
-        password = st.text_input("🔑 Masukkan Kata Laluan", type="password")
+        st.markdown("👤 **Masukkan ID:**")
+        user_id = st.text_input("", key="login_id")
 
-        login_button = st.button("Log Masuk", use_container_width=True)
+        st.markdown("🔑 **Masukkan Kata Laluan:**")
+        password = st.text_input("", type="password", key="login_pass")
 
-        if login_button:
-          if user_id == USER_ID and password == USER_PASS:
-    st.session_state["login_success"] = True
-    st.session_state["nama"] = "Admin PUO"
-    st.rerun()
-else:
-    st.error("ID atau Kata Laluan Salah")
+        login = st.button("Log Masuk", use_container_width=True)
 
-        st.markdown("<br>", unsafe_allow_html=True)
+        if login:
+
+            if user_id == USER_ID and password == USER_PASS:
+
+                st.session_state["password_correct"] = True
+                st.session_state["nama"] = "Admin"
+                st.rerun()
+
+            else:
+
+                st.error("ID atau Kata Laluan Salah")
+
         st.button("❓ Lupa Kata Laluan?", use_container_width=True)
 
-    if "login_success" in st.session_state and st.session_state["login_success"]:
+    if "password_correct" in st.session_state and st.session_state["password_correct"]:
         return True
     else:
         return False
-
-
+        
 # ================== MAIN APP ==================
 if check_password():
-
-    st.success(f"Selamat Datang {st.session_state.nama}")
+    # Set config halaman
+    st.set_page_config(page_title="Visualisasi Poligon Pro", layout="wide")
 
     # --- PENYELESAIAN LOGO ---
     current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -156,6 +138,7 @@ if check_password():
     label_size_stn = st.sidebar.slider("Saiz Label Stesen", 6, 16, 10)
     label_size_data = st.sidebar.slider("Saiz Bearing/Jarak", 5, 12, 7)
     
+    # FEATURE BARU: Slider untuk ubah saiz tulisan "LUAS"
     label_size_luas = st.sidebar.slider("Saiz Tulisan LUAS", 8, 30, 12) 
     
     dist_offset = st.sidebar.slider("Jarak Label Stesen ke Luar", 0.5, 5.0, 1.5)
@@ -175,12 +158,14 @@ if check_password():
                 st.info("Sila upload fail CSV untuk bermula.")
                 st.stop()
 
+        # Generate Geometri
         coords = list(zip(df['E'], df['N']))
         poly_geom = Polygon(coords)
         line_geom = LineString(coords + [coords[0]])
         centroid = poly_geom.centroid
         area = poly_geom.area
 
+        # --- PENYEDIAAN DATA QGIS ---
         poly_feature = {"type": "Feature", "properties": {"Jenis": "Kawasan", "Luas_m2": round(area, 3)}, "geometry": poly_geom.__geo_interface__}
         line_feature = {"type": "Feature", "properties": {"Jenis": "Sempadan"}, "geometry": line_geom.__geo_interface__}
         stn_features = [{"type": "Feature", "properties": {"STN": int(r['STN'])}, "geometry": Point(r['E'], r['N']).__geo_interface__} for _, r in df.iterrows()]
@@ -195,7 +180,7 @@ if check_password():
         col3.metric("Bilangan Stesen", len(df))
         col4.metric("Status", "Tutup" if poly_geom.is_valid else "Ralat")
 
-        # ================== PLOT ==================
+        # ================== PLOT (MATPLOTLIB) ==================
         if plot_theme == "Dark Mode":
             bg_color, grid_color, text_color, line_c = "#121212", "#555555", "white", "cyan"
         elif plot_theme == "Blueprint":
@@ -207,9 +192,11 @@ if check_password():
         fig.patch.set_facecolor(bg_color)
         ax.set_facecolor(bg_color)
 
+        # Plot Garisan Sempadan
         ax.plot(*(line_geom.xy), linewidth=2, color=line_c, zorder=4)
         ax.fill(*(poly_geom.exterior.xy), color='green', alpha=0.1, zorder=1)
 
+        # Grid Latar Belakang
         if show_bg_grid:
             min_e, min_n, max_e, max_n = poly_geom.bounds
             ax.set_xlim(np.floor(min_e/10)*10 - 20, np.ceil(max_e/10)*10 + 20)
@@ -220,53 +207,42 @@ if check_password():
         else:
             ax.axis('off')
 
+        # PAPARAN TULISAN LUAS (DENGAN SAIZ DINAMIK)
         ax.text(centroid.x, centroid.y, f"LUAS\n{area:.2f} m²", 
-                fontsize=label_size_luas,
-                fontweight='bold',
-                color='darkgreen',
+                fontsize=label_size_luas, # <--- Menggunakan saiz dari slider
+                fontweight='bold', 
+                color='darkgreen', 
                 ha='center',
-                bbox=dict(boxstyle='round,pad=0.3', fc='white', alpha=0.9, ec='green'),
+                bbox=dict(boxstyle='round,pad=0.3', fc='white', alpha=0.9, ec='green'), 
                 zorder=10)
 
+        # Plot Label Bearing, Jarak dan No Stesen
         for i in range(len(df)):
             p1, p2 = df.iloc[i], df.iloc[(i + 1) % len(df)]
             dE, dN = p2['E'] - p1['E'], p2['N'] - p1['N']
             dist, bear = np.sqrt(dE**2 + dN**2), (np.degrees(np.arctan2(dE, dN)) + 360) % 360
             
+            # Kira sudut pusingan teks supaya selari dengan garisan
             txt_angle = np.degrees(np.arctan2(dN, dE))
             if txt_angle > 90: txt_angle -= 180
             if txt_angle < -90: txt_angle += 180
             
-            ax.text((p1['E']+p2['E'])/2, (p1['N']+p2['N'])/2,
-                    f"{format_dms(bear)}\n{dist:.2f}m",
-                    fontsize=label_size_data,
-                    color='brown',
-                    fontweight='bold',
-                    ha='center',
-                    rotation=txt_angle,
-                    bbox=dict(boxstyle='round,pad=0.1', fc=bg_color, alpha=0.4, ec='none'),
-                    zorder=6)
+            # Label Bearing & Jarak
+            ax.text((p1['E']+p2['E'])/2, (p1['N']+p2['N'])/2, f"{format_dms(bear)}\n{dist:.2f}m", 
+                    fontsize=label_size_data, color='brown', fontweight='bold', ha='center', rotation=txt_angle,
+                    bbox=dict(boxstyle='round,pad=0.1', fc=bg_color, alpha=0.4, ec='none'), zorder=6)
 
+            # Label Nombor Stesen (Offset ke luar)
             ve, vn = p1['E'] - centroid.x, p1['N'] - centroid.y
             mag = np.sqrt(ve**2 + vn**2)
-
-            ax.text(p1['E'] + (ve/mag)*dist_offset,
-                    p1['N'] + (vn/mag)*dist_offset,
-                    str(int(p1['STN'])),
-                    fontsize=label_size_stn,
-                    fontweight='bold',
-                    color='blue',
-                    ha='center',
-                    zorder=7)
-
+            ax.text(p1['E'] + (ve/mag)*dist_offset, p1['N'] + (vn/mag)*dist_offset, 
+                    str(int(p1['STN'])), fontsize=label_size_stn, fontweight='bold', color='blue', ha='center', zorder=7)
+            
+            # Titik Stesen (Point)
             ax.scatter(p1['E'], p1['N'], color='red', s=50, edgecolors='black', zorder=8)
 
         ax.set_aspect("equal", adjustable="box")
-
         st.pyplot(fig)
 
     except Exception as e:
         st.error(f"❌ Ralat: Sila pastikan format CSV betul (E, N, STN). Ralat teknikal: {e}")
-
-
-
