@@ -129,73 +129,63 @@ with col2:
         centroid = poly_geom.centroid
         area = poly_geom.area
 
-# ================== CONVERT KOORDINAT KE LATLON ==================
-# EPSG 4390 → WGS84
-transformer = Transformer.from_crs("EPSG:4390", "EPSG:4326", always_xy=True)
+try:
+    if uploaded_file is not None:
+        df = pd.read_csv(uploaded_file)
+    else:
+        data_path = os.path.join(current_dir, "point.csv")
+        if os.path.exists(data_path):
+            df = pd.read_csv(data_path)
+        else:
+            st.info("Sila upload fail CSV untuk bermula.")
+            st.stop()
 
-latlon_coords = []
+    # Generate Geometri
+    coords = list(zip(df['E'], df['N']))
+    poly_geom = Polygon(coords)
+    line_geom = LineString(coords + [coords[0]])
+    centroid = poly_geom.centroid
+    area = poly_geom.area
 
-for e, n in coords:
-    lon, lat = transformer.transform(e, n)
-    latlon_coords.append([lat, lon])
+    # ================== CONVERT KOORDINAT ==================
+    from pyproj import Transformer
+    transformer = Transformer.from_crs("EPSG:4390", "EPSG:4326", always_xy=True)
 
-     # ================== PETA SATELIT ==================
-st.subheader("🛰️ Paparan Satellite Lot Tanah")
+    latlon_coords = []
 
-center = latlon_coords[0]
+    for e, n in coords:
+        lon, lat = transformer.transform(e, n)
+        latlon_coords.append([lat, lon])
 
-m = folium.Map(
-    location=center,
-    zoom_start=19,
-    control_scale=True
-)
+    # ================== PETA SATELIT ==================
+    st.subheader("🛰️ Paparan Satellite Lot Tanah")
 
-# Satellite layer
-folium.TileLayer(
-    tiles="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-    attr="Esri",
-    name="Satellite"
-).add_to(m)
+    center = latlon_coords[0]
 
-# OpenStreetMap
-folium.TileLayer(
-    "OpenStreetMap",
-    name="OSM"
-).add_to(m)
+    m = folium.Map(
+        location=center,
+        zoom_start=19,
+        control_scale=True
+    )
 
-# Polygon lot
-folium.Polygon(
-    locations=latlon_coords,
-    color="yellow",
-    weight=3,
-    fill=True,
-    fill_opacity=0.4
-).add_to(m)
-
-# Marker stesen
-for i,row in df.iterrows():
-    lon, lat = transformer.transform(row['E'], row['N'])
-
-    folium.CircleMarker(
-        location=[lat,lon],
-        radius=6,
-        color="red",
-        fill=True,
-        fill_color="red",
-        popup=f"""
-        STESEN {int(row['STN'])}<br>
-        E: {row['E']}<br>
-        N: {row['N']}
-        """
+    folium.TileLayer(
+        tiles="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+        attr="Esri",
+        name="Satellite"
     ).add_to(m)
 
-# MiniMap
-MiniMap(toggle_display=True).add_to(m)
+    folium.Polygon(
+        locations=latlon_coords,
+        color="yellow",
+        weight=3,
+        fill=True,
+        fill_opacity=0.3
+    ).add_to(m)
 
-# Layer switch
-folium.LayerControl().add_to(m)
+    st_folium(m, width=900, height=500)
 
-st_folium(m, width=900, height=500)
+except Exception as e:
+    st.error(f"❌ Ralat: {e}")
 
         # --- PENYEDIAAN DATA QGIS ---
         poly_feature = {"type": "Feature", "properties": {"Jenis": "Kawasan", "Luas_m2": round(area, 3)}, "geometry": poly_geom.__geo_interface__}
@@ -280,6 +270,7 @@ st_folium(m, width=900, height=500)
     except Exception as e:
 
         st.error(f"❌ Ralat: Sila pastikan format CSV betul (E, N, STN). Ralat teknikal: {e}")
+
 
 
 
