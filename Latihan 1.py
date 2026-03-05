@@ -143,10 +143,8 @@ with col2:
         col3.metric("Bilangan Stesen", len(df))
         col4.metric("Status", "Tutup" if poly_geom.is_valid else "Ralat")
 
-       try:
-    ...
+     try:
     # ================== PETA SATELIT ==================
-
     st.subheader("🛰️ Paparan Satellite Lot Tanah")
 
     center_lat = centroid.y
@@ -177,12 +175,11 @@ with col2:
 
     st_folium(m, width=900, height=500)
 
-    # ================== PAPAR POLIGON MATPLOTLIB ==================
-
+    # plot matplotlib
     st.pyplot(fig)
 
 except Exception as e:
-    st.error(f"❌ Ralat: Sila pastikan format CSV betul (E, N, STN). Ralat teknikal: {e}")
+    st.error(f"❌ Ralat: {e}")
 
         # ================== PLOT (MATPLOTLIB) ==================
         if plot_theme == "Dark Mode":
@@ -251,6 +248,7 @@ except Exception as e:
     except Exception as e:
 
         st.error(f"❌ Ralat: Sila pastikan format CSV betul (E, N, STN). Ralat teknikal: {e}")
+
 
 
 
