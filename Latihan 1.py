@@ -5,10 +5,6 @@ import numpy as np
 from shapely.geometry import Polygon, Point, LineString
 import json
 import os
-import folium
-from folium.plugins import MiniMap
-from streamlit_folium import st_folium
-from pyproj import Transformer
 
 # ================== FUNGSI TUKAR DMS ==================
 def format_dms(decimal_degree):
@@ -42,51 +38,24 @@ if check_password():
     # Set config halaman
     st.set_page_config(page_title="Visualisasi Poligon Pro", layout="wide")
 
-   # ================== HEADER PROFESSIONAL ==================
+    # --- PENYELESAIAN LOGO ---
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    logo_path = os.path.join(current_dir, "puo.png")
 
-current_dir = os.path.dirname(os.path.abspath(__file__))
-logo_path = os.path.join(current_dir, "PUO.png")
+    col_logo, col_text = st.columns([1, 8])
 
-st.markdown("""
-<style>
-.header-container{
-    background: linear-gradient(90deg,#002147,#003366,#004080);
-    padding:15px;
-    border-radius:10px;
-    margin-bottom:10px;
-}
+    with col_logo:
+        if os.path.exists(logo_path):
+            st.image(logo_path, width=120)
+        else:
+            try:
+                st.image("puo.png", width=120)
+            except:
+                st.markdown("⚠️ **Logo tidak dijumpai**")
 
-.header-title{
-    color:white;
-    font-size:34px;
-    font-weight:bold;
-    margin-bottom:0px;
-}
-
-.header-sub{
-    color:#dddddd;
-    font-size:16px;
-}
-</style>
-""", unsafe_allow_html=True)
-
-col1, col2 = st.columns([1,8])
-
-with col1:
-    if os.path.exists(logo_path):
-        st.image(logo_path, width=120)
-
-with col2:
-    st.markdown("""
-    <div class="header-container">
-        <div class="header-title">
-        SISTEM SURVEY LOT PERUMAHAN
-        </div>
-        <div class="header-sub">
-        Politeknik Ungku Omar | Visualisasi Pelan Lot Tanah
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+    with col_text:
+        st.title("POLITEKNIK UNGKU OMAR")
+        st.caption("Paparan poligon tanah dengan Grid Latar Belakang (Dashed)")
 
     # ================== SIDEBAR ==================
     st.sidebar.header("⚙️ Tetapan Paparan")
@@ -115,7 +84,7 @@ with col2:
         if uploaded_file is not None:
             df = pd.read_csv(uploaded_file)
         else:
-            data_path = os.path.join(current_dir, "point.csv")
+            data_path = os.path.join(current_dir, "data ukur.csv")
             if os.path.exists(data_path):
                 df = pd.read_csv(data_path)
             else:
@@ -128,64 +97,6 @@ with col2:
         line_geom = LineString(coords + [coords[0]])
         centroid = poly_geom.centroid
         area = poly_geom.area
-
-try:
-    if uploaded_file is not None:
-        df = pd.read_csv(uploaded_file)
-    else:
-        data_path = os.path.join(current_dir, "point.csv")
-        if os.path.exists(data_path):
-            df = pd.read_csv(data_path)
-        else:
-            st.info("Sila upload fail CSV untuk bermula.")
-            st.stop()
-
-    # Generate Geometri
-    coords = list(zip(df['E'], df['N']))
-    poly_geom = Polygon(coords)
-    line_geom = LineString(coords + [coords[0]])
-    centroid = poly_geom.centroid
-    area = poly_geom.area
-
-    # ================== CONVERT KOORDINAT ==================
-    from pyproj import Transformer
-    transformer = Transformer.from_crs("EPSG:4390", "EPSG:4326", always_xy=True)
-
-    latlon_coords = []
-
-    for e, n in coords:
-        lon, lat = transformer.transform(e, n)
-        latlon_coords.append([lat, lon])
-
-    # ================== PETA SATELIT ==================
-    st.subheader("🛰️ Paparan Satellite Lot Tanah")
-
-    center = latlon_coords[0]
-
-    m = folium.Map(
-        location=center,
-        zoom_start=19,
-        control_scale=True
-    )
-
-    folium.TileLayer(
-        tiles="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-        attr="Esri",
-        name="Satellite"
-    ).add_to(m)
-
-    folium.Polygon(
-        locations=latlon_coords,
-        color="yellow",
-        weight=3,
-        fill=True,
-        fill_opacity=0.3
-    ).add_to(m)
-
-    st_folium(m, width=900, height=500)
-
-except Exception as e:
-    st.error(f"❌ Ralat: {e}")
 
         # --- PENYEDIAAN DATA QGIS ---
         poly_feature = {"type": "Feature", "properties": {"Jenis": "Kawasan", "Luas_m2": round(area, 3)}, "geometry": poly_geom.__geo_interface__}
@@ -201,7 +112,6 @@ except Exception as e:
         col2.metric("Luas (Ekar)", f"{area/4046.856:.4f}")
         col3.metric("Bilangan Stesen", len(df))
         col4.metric("Status", "Tutup" if poly_geom.is_valid else "Ralat")
-
 
         # ================== PLOT (MATPLOTLIB) ==================
         if plot_theme == "Dark Mode":
@@ -268,14 +178,4 @@ except Exception as e:
         st.pyplot(fig)
 
     except Exception as e:
-
         st.error(f"❌ Ralat: Sila pastikan format CSV betul (E, N, STN). Ralat teknikal: {e}")
-
-
-
-
-
-
-
-
-
