@@ -84,7 +84,7 @@ if check_password():
         if uploaded_file is not None:
             df = pd.read_csv(uploaded_file)
         else:
-            data_path = os.path.join(current_dir, "data ukur.csv")
+            data_path = os.path.join(current_dir, "point.csv")
             if os.path.exists(data_path):
                 df = pd.read_csv(data_path)
             else:
@@ -178,4 +178,5 @@ if check_password():
         st.pyplot(fig)
 
     except Exception as e:
+
         st.error(f"❌ Ralat: Sila pastikan format CSV betul (E, N, STN). Ralat teknikal: {e}")
