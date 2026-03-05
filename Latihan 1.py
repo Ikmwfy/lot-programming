@@ -38,26 +38,51 @@ if check_password():
     # Set config halaman
     st.set_page_config(page_title="Visualisasi Poligon Pro", layout="wide")
 
-    # --- PENYELESAIAN LOGO ---
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    logo_path = os.path.join(current_dir, "puo.png")
+   # ================== HEADER PROFESSIONAL ==================
 
-   # ================== HEADER ==================
+current_dir = os.path.dirname(os.path.abspath(__file__))
+logo_path = os.path.join(current_dir, "PUO.png")
 
-col_logo, col_title = st.columns([1,10])
+st.markdown("""
+<style>
+.header-container{
+    background: linear-gradient(90deg,#002147,#003366,#004080);
+    padding:15px;
+    border-radius:10px;
+    margin-bottom:10px;
+}
 
-with col_logo:
-    if os.path.exists("PUO.png"):
-        st.image("PUO.png", width=120)
-    else:
-        st.warning("Logo PUO.png tidak dijumpai")
+.header-title{
+    color:white;
+    font-size:34px;
+    font-weight:bold;
+    margin-bottom:0px;
+}
 
-with col_title:
-    st.markdown(
-        "<h1 style='margin-bottom:0;'>SISTEM SURVEY LOT PERUMAHAN</h1>",
-        unsafe_allow_html=True
-    )
-    st.caption("Politeknik Ungku Omar - Visualisasi Pelan Lot Tanah")
+.header-sub{
+    color:#dddddd;
+    font-size:16px;
+}
+</style>
+""", unsafe_allow_html=True)
+
+col1, col2 = st.columns([1,8])
+
+with col1:
+    if os.path.exists(logo_path):
+        st.image(logo_path, width=120)
+
+with col2:
+    st.markdown("""
+    <div class="header-container">
+        <div class="header-title">
+        SISTEM SURVEY LOT PERUMAHAN
+        </div>
+        <div class="header-sub">
+        Politeknik Ungku Omar | Visualisasi Pelan Lot Tanah
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
     # ================== SIDEBAR ==================
     st.sidebar.header("⚙️ Tetapan Paparan")
@@ -182,4 +207,5 @@ with col_title:
     except Exception as e:
 
         st.error(f"❌ Ralat: Sila pastikan format CSV betul (E, N, STN). Ralat teknikal: {e}")
+
 
