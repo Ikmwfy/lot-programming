@@ -143,8 +143,17 @@ with col2:
         col3.metric("Bilangan Stesen", len(df))
         col4.metric("Status", "Tutup" if poly_geom.is_valid else "Ralat")
 
-     try:
+  try:
+    # ================== BACA DATA ==================
+
+    coords = list(zip(df['E'], df['N']))
+    poly_geom = Polygon(coords)
+    line_geom = LineString(coords + [coords[0]])
+    centroid = poly_geom.centroid
+    area = poly_geom.area
+
     # ================== PETA SATELIT ==================
+
     st.subheader("🛰️ Paparan Satellite Lot Tanah")
 
     center_lat = centroid.y
@@ -167,15 +176,18 @@ with col2:
         color="yellow",
         weight=3,
         fill=True,
-        fill_opacity=0.2
+        fill_opacity=0.3
     ).add_to(m)
+
+    # ================== MINI MAP ==================
 
     minimap = MiniMap(toggle_display=True, position="bottomright")
     m.add_child(minimap)
 
     st_folium(m, width=900, height=500)
 
-    # plot matplotlib
+    # ================== PAPAR PLOT ==================
+
     st.pyplot(fig)
 
 except Exception as e:
@@ -248,6 +260,7 @@ except Exception as e:
     except Exception as e:
 
         st.error(f"❌ Ralat: Sila pastikan format CSV betul (E, N, STN). Ralat teknikal: {e}")
+
 
 
 
