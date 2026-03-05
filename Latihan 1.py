@@ -6,6 +6,45 @@ from shapely.geometry import Polygon, Point, LineString
 import json
 import os
 
+st.set_page_config(page_title="Sistem Survey Lot PUO", layout="centered")
+
+st.markdown("""
+<style>
+
+.stApp{
+    background: linear-gradient(180deg,#050b18,#000000);
+}
+
+.login-box{
+    background:#0f172a;
+    padding:40px;
+    border-radius:15px;
+    width:450px;
+    margin:auto;
+    margin-top:80px;
+    box-shadow:0px 0px 20px rgba(0,0,0,0.6);
+}
+
+.login-title{
+    text-align:center;
+    font-size:34px;
+    color:white;
+    margin-bottom:30px;
+}
+
+.stTextInput input{
+    background:#1e293b;
+    color:white;
+}
+
+button[kind="primary"]{
+    background:#2563eb;
+    width:100%;
+}
+
+</style>
+""", unsafe_allow_html=True)
+
 # ================== FUNGSI TUKAR DMS ==================
 def format_dms(decimal_degree):
     d = int(decimal_degree)
@@ -15,23 +54,33 @@ def format_dms(decimal_degree):
 
 # ================== FUNGSI LOGIN ==================
 def check_password():
-    """Memulangkan True jika pengguna memasukkan kata laluan yang betul."""
-    def password_entered():
-        if st.session_state["password"] == "admin123": # <--- TUKAR PASSWORD ANDA DI SINI
-            st.session_state["password_correct"] = True
-            del st.session_state["password"]  
-        else:
-            st.session_state["password_correct"] = False
 
-    if "password_correct" not in st.session_state:
-        st.text_input("Sila masukkan Kata Laluan", type="password", on_change=password_entered, key="password")
-        return False
-    elif not st.session_state["password_correct"]:
-        st.text_input("Sila masukkan Kata Laluan", type="password", on_change=password_entered, key="password")
-        st.error("😕 Kata laluan salah.")
-        return False
-    else:
+    if "login_status" not in st.session_state:
+        st.session_state.login_status = False
+
+    if st.session_state.login_status:
         return True
+
+    st.markdown('<div class="login-box">', unsafe_allow_html=True)
+
+    st.markdown('<div class="login-title">🔐 Sistem Survey Lot PUO</div>', unsafe_allow_html=True)
+
+    username = st.text_input("👤 Masukkan ID")
+    password = st.text_input("🔑 Masukkan Kata Laluan", type="password")
+
+    if st.button("Log Masuk"):
+
+        if username == "admin" and password == "admin123":
+            st.session_state.login_status = True
+            st.rerun()
+        else:
+            st.error("ID atau Kata Laluan salah")
+
+    st.button("❓ Lupa Kata Laluan")
+
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    return False
 
 # ================== MAIN APP ==================
 if check_password():
@@ -179,3 +228,4 @@ if check_password():
 
     except Exception as e:
         st.error(f"❌ Ralat: Sila pastikan format CSV betul (E, N, STN). Ralat teknikal: {e}")
+
