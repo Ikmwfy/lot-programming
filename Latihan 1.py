@@ -109,20 +109,46 @@ if check_password():
     current_dir = os.path.dirname(os.path.abspath(__file__))
     logo_path = os.path.join(current_dir, "puo.png")
 
-    col_logo, col_text = st.columns([1, 8])
+    # ================== HEADER BERWARNA ==================
+st.markdown("""
+<style>
 
-    with col_logo:
-        if os.path.exists(logo_path):
-            st.image(logo_path, width=120)
-        else:
-            try:
-                st.image("puo.png", width=120)
-            except:
-                st.markdown("⚠️ **Logo tidak dijumpai**")
+.header-box{
+    background: linear-gradient(90deg,#0f172a,#1e293b);
+    padding:25px;
+    border-radius:15px;
+    margin-bottom:25px;
+}
 
-    with col_text:
-        st.title("POLITEKNIK UNGKU OMAR")
-        st.caption("Paparan poligon tanah dengan Grid Latar Belakang (Dashed)")
+.header-title{
+    font-size:42px;
+    font-weight:800;
+    color:white;
+}
+
+.header-sub{
+    font-size:16px;
+    color:#cbd5e1;
+}
+
+</style>
+""", unsafe_allow_html=True)
+
+col_logo, col_title = st.columns([1,6])
+
+with col_logo:
+    if os.path.exists(logo_path):
+        st.image(logo_path, width=130)
+    else:
+        st.warning("Logo PUO.png tidak dijumpai")
+
+with col_title:
+    st.markdown("""
+    <div class="header-box">
+        <div class="header-title">SISTEM SURVEY LOT RUMAH</div>
+        <div class="header-sub">Politeknik Ungku Omar | Jabatan Kejuruteraan Awam</div>
+    </div>
+    """, unsafe_allow_html=True)
 
     # ================== SIDEBAR ==================
     st.sidebar.header("⚙️ Tetapan Paparan")
@@ -246,3 +272,4 @@ if check_password():
 
     except Exception as e:
         st.error(f"❌ Ralat: Sila pastikan format CSV betul (E, N, STN). Ralat teknikal: {e}")
+
