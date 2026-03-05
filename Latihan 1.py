@@ -5,6 +5,9 @@ import numpy as np
 from shapely.geometry import Polygon, Point, LineString
 import json
 import os
+import folium
+from folium.plugins import MiniMap
+from streamlit_folium import st_folium
 
 # ================== FUNGSI TUKAR DMS ==================
 def format_dms(decimal_degree):
@@ -140,6 +143,56 @@ with col2:
         col3.metric("Bilangan Stesen", len(df))
         col4.metric("Status", "Tutup" if poly_geom.is_valid else "Ralat")
 
+        # ================== PETA SATELIT ==================
+
+st.subheader("🛰️ Paparan Satellite Lot Tanah")
+
+# pusat peta
+center_lat = centroid.y
+center_lon = centroid.x
+
+# buat map
+m = folium.Map(
+    location=[center_lat, center_lon],
+    zoom_start=18,
+    tiles=None
+)
+
+# SATELLITE LAYER
+folium.TileLayer(
+    tiles="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+    attr="Esri",
+    name="Satellite",
+    overlay=False,
+    control=True
+).add_to(m)
+
+# polygon lot
+folium.Polygon(
+    locations=[(n, e) for e, n in coords],
+    color="yellow",
+    weight=3,
+    fill=True,
+    fill_opacity=0.2
+).add_to(m)
+
+# titik stesen
+for _, r in df.iterrows():
+    folium.CircleMarker(
+        location=[r["N"], r["E"]],
+        radius=5,
+        color="red",
+        fill=True,
+        popup=f"STN {int(r['STN'])}"
+    ).add_to(m)
+
+# ================== MINI MAP ==================
+minimap = MiniMap(toggle_display=True, position="bottomright")
+m.add_child(minimap)
+
+# papar dalam streamlit
+st_folium(m, width=900, height=500)
+
         # ================== PLOT (MATPLOTLIB) ==================
         if plot_theme == "Dark Mode":
             bg_color, grid_color, text_color, line_c = "#121212", "#555555", "white", "cyan"
@@ -207,5 +260,6 @@ with col2:
     except Exception as e:
 
         st.error(f"❌ Ralat: Sila pastikan format CSV betul (E, N, STN). Ralat teknikal: {e}")
+
 
 
