@@ -8,6 +8,7 @@ import os
 import folium
 from folium.plugins import MiniMap
 from streamlit_folium import st_folium
+from pyproj import Transformer
 
 # ================== FUNGSI TUKAR DMS ==================
 def format_dms(decimal_degree):
@@ -128,35 +129,71 @@ with col2:
         centroid = poly_geom.centroid
         area = poly_geom.area
 
-        # ================== PETA SATELIT ==================
+# ================== CONVERT KOORDINAT KE LATLON ==================
+# EPSG 4390 → WGS84
+transformer = Transformer.from_crs("EPSG:4390", "EPSG:4326", always_xy=True)
 
+latlon_coords = []
+
+for e, n in coords:
+    lon, lat = transformer.transform(e, n)
+    latlon_coords.append([lat, lon])
+
+     # ================== PETA SATELIT ==================
 st.subheader("🛰️ Paparan Satellite Lot Tanah")
 
-center_lat = centroid.y
-center_lon = centroid.x
+center = latlon_coords[0]
 
 m = folium.Map(
-    location=[center_lat, center_lon],
-    zoom_start=18,
-    tiles=None
+    location=center,
+    zoom_start=19,
+    control_scale=True
 )
 
+# Satellite layer
 folium.TileLayer(
     tiles="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
     attr="Esri",
     name="Satellite"
 ).add_to(m)
 
+# OpenStreetMap
+folium.TileLayer(
+    "OpenStreetMap",
+    name="OSM"
+).add_to(m)
+
+# Polygon lot
 folium.Polygon(
-    locations=[(n, e) for e, n in coords],
+    locations=latlon_coords,
     color="yellow",
     weight=3,
     fill=True,
-    fill_opacity=0.3
+    fill_opacity=0.4
 ).add_to(m)
 
-minimap = MiniMap(toggle_display=True, position="bottomright")
-m.add_child(minimap)
+# Marker stesen
+for i,row in df.iterrows():
+    lon, lat = transformer.transform(row['E'], row['N'])
+
+    folium.CircleMarker(
+        location=[lat,lon],
+        radius=6,
+        color="red",
+        fill=True,
+        fill_color="red",
+        popup=f"""
+        STESEN {int(row['STN'])}<br>
+        E: {row['E']}<br>
+        N: {row['N']}
+        """
+    ).add_to(m)
+
+# MiniMap
+MiniMap(toggle_display=True).add_to(m)
+
+# Layer switch
+folium.LayerControl().add_to(m)
 
 st_folium(m, width=900, height=500)
 
@@ -243,6 +280,7 @@ st_folium(m, width=900, height=500)
     except Exception as e:
 
         st.error(f"❌ Ralat: Sila pastikan format CSV betul (E, N, STN). Ralat teknikal: {e}")
+
 
 
 
