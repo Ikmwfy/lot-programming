@@ -6,7 +6,16 @@ from shapely.geometry import Polygon, Point, LineString
 import json
 import os
 
-st.set_page_config(page_title="Sistem Survey Lot PUO", layout="centered")
+# ================== DATA AHLI ==================
+
+users = {
+    "1": "Ikmal Wafiy",
+    "2": "Ahmad",
+    "3": "Siti",
+    "4": "Ali"
+}
+
+st.set_page_config(page_title="Sistem Survey Lot Rumah", layout="centered")
 
 st.markdown("""
 <style>
@@ -52,7 +61,6 @@ def format_dms(decimal_degree):
     s = round((((decimal_degree - d) * 60) - m) * 60, 0)
     return f"{d}°{abs(m):02d}'{abs(int(s)):02d}\""
 
-# ================== FUNGSI LOGIN ==================
 def check_password():
 
     if "login_status" not in st.session_state:
@@ -63,25 +71,22 @@ def check_password():
 
     st.markdown('<div class="login-box">', unsafe_allow_html=True)
 
-    st.markdown('<div class="login-title">🔐 Sistem Survey Lot PUO</div>', unsafe_allow_html=True)
+    st.markdown('<div class="login-title">🔐 Sistem Survey Lot Rumah</div>', unsafe_allow_html=True)
 
-    username = st.text_input("👤 Masukkan ID")
-    password = st.text_input("🔑 Masukkan Kata Laluan", type="password")
+    user_id = st.text_input("Masukkan ID Ahli")
 
     if st.button("Log Masuk"):
 
-        if username == "admin" and password == "admin123":
+        if user_id in users:
             st.session_state.login_status = True
+            st.session_state.nama = users[user_id]
             st.rerun()
         else:
-            st.error("ID atau Kata Laluan salah")
-
-    st.button("❓ Lupa Kata Laluan")
+            st.error("ID tidak wujud")
 
     st.markdown('</div>', unsafe_allow_html=True)
 
     return False
-
 # ================== MAIN APP ==================
 if check_password():
     # Set config halaman
@@ -228,4 +233,5 @@ if check_password():
 
     except Exception as e:
         st.error(f"❌ Ralat: Sila pastikan format CSV betul (E, N, STN). Ralat teknikal: {e}")
+
 
