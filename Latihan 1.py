@@ -238,5 +238,93 @@ try:
     ax.set_aspect("equal")
     st.pyplot(fig)
 
+# ================== PETA INTERAKTIF (SEPERTI GAMBAR) ==================
+st.subheader("🛰️ Paparan Satellite Lot Tanah (Interactive Map)")
+
+try:
+    import folium
+    from streamlit.components.v1 import html
+
+    # center map
+    center_lat = df['N'].mean()
+    center_lon = df['E'].mean()
+
+    m = folium.Map(
+        location=[center_lat, center_lon],
+        zoom_start=20,
+        tiles=None
+    )
+
+    # Layer OSM
+    folium.TileLayer(
+        tiles="OpenStreetMap",
+        name="openstreetmap"
+    ).add_to(m)
+
+    # Satellite layer
+    folium.TileLayer(
+        tiles="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+        attr="Esri",
+        name="Google Hybrid (Satelit)"
+    ).add_to(m)
+
+    # Polygon coordinates
+    polygon_coords = list(zip(df["N"], df["E"]))
+
+    # Polygon lot
+    folium.Polygon(
+        locations=polygon_coords,
+        color="magenta",
+        weight=4,
+        fill=True,
+        fill_color="magenta",
+        fill_opacity=0.3,
+        name="Data Survey"
+    ).add_to(m)
+
+    # Marker stesen
+    for i, row in df.iterrows():
+
+        popup_html = f"""
+        <b>STESEN {row['STN']}</b><br>
+        E: {row['E']}<br>
+        N: {row['N']}
+        """
+
+        folium.CircleMarker(
+            location=[row["N"], row["E"]],
+            radius=6,
+            color="red",
+            fill=True,
+            fill_color="red",
+            popup=popup_html
+        ).add_to(m)
+
+        # label stesen
+        folium.Marker(
+            location=[row["N"], row["E"]],
+            icon=folium.DivIcon(html=f"""
+                <div style="
+                font-size:12px;
+                color:white;
+                background:red;
+                border-radius:50%;
+                width:20px;
+                height:20px;
+                text-align:center;
+                line-height:20px;">
+                {int(row['STN'])}
+                </div>
+            """)
+        ).add_to(m)
+
+    folium.LayerControl().add_to(m)
+
+    map_html = m._repr_html_()
+    html(map_html, height=600)
+
+except Exception as e:
+    st.error(f"Gagal memaparkan peta interaktif: {e}")
+
 except Exception as e:
     st.error(f"Sila pastikan format CSV betul. Ralat: {e}")
