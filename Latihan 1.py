@@ -164,7 +164,7 @@ try:
     if uploaded_file is not None:
         df = pd.read_csv(uploaded_file)
     else:
-        data_path = os.path.join(current_dir, "data ukur.csv")
+        data_path = os.path.join(current_dir, "point.csv")
         if os.path.exists(data_path):
             df = pd.read_csv(data_path)
         else:
@@ -338,4 +338,5 @@ try:
 
 except:
     st.info("Peta akan muncul selepas data CSV dimuat naik.")
+
 
