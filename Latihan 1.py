@@ -9,7 +9,7 @@ import contextily as cx
 import base64
 
 # Set config halaman
-st.set_page_config(page_title="Visualisasi Poligon Pro", layout="wide")
+st.set_page_config(page_title="Survey Lot Rumah", layout="wide")
 
 # Fungsi untuk menukar video ke base64 supaya boleh dimainkan dalam HTML
 def get_video_base64(video_path):
@@ -27,7 +27,7 @@ def format_dms(decimal_degree):
 # ================== FUNGSI LOGIN ==================
 def login_screen():
     USER_ID = "1"
-    USER_PASS = "admin123"
+    USER_PASS = "ikmalkacak"
 
     st.markdown("""
     <style>
@@ -61,7 +61,7 @@ if not st.session_state["password_correct"]:
 # ================== MAIN APP ==================
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
-logo_path = os.path.join(current_dir, "puo.png")
+logo_path = os.path.join(current_dir, "PUO.png")
 video_path = os.path.join(current_dir, "VIDEO.mp4")
 
 # ================== HEADER VISUAL BERGERAK (VIDEO) ==================
@@ -240,3 +240,4 @@ try:
 
 except Exception as e:
     st.error(f"Sila pastikan format CSV betul. Ralat: {e}")
+
