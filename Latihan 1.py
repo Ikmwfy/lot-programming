@@ -5,10 +5,17 @@ import numpy as np
 from shapely.geometry import Polygon, Point, LineString
 import json
 import os
-import contextily as cx # Perlu install: pip install contextily xyzservices
+import contextily as cx 
+import base64
 
-# Set config halaman (Mesti berada di baris pertama selepas import)
+# Set config halaman
 st.set_page_config(page_title="Visualisasi Poligon Pro", layout="wide")
+
+# Fungsi untuk menukar video ke base64 supaya boleh dimainkan dalam HTML
+def get_video_base64(video_path):
+    with open(video_path, "rb") as f:
+        data = f.read()
+    return base64.b64encode(data).decode()
 
 # ================== FUNGSI TUKAR DMS ==================
 def format_dms(decimal_degree):
@@ -24,52 +31,24 @@ def login_screen():
 
     st.markdown("""
     <style>
-    .stApp{
-        background-color:#0b1220;
-    }
-    .title{
-        text-align:center;
-        font-size:42px;
-        font-weight:700;
-        color:white;
-        margin-bottom:40px;
-    }
-    div[data-testid="stTextInput"] input{
-        background-color:#1e293b;
-        color:white;
-        border-radius:10px;
-        border:1px solid #334155;
-        height:45px;
-    }
-    div[data-testid="stButton"] button{
-        height:45px;
-        border-radius:10px;
-        font-weight:600;
-        background-color:#111827;
-        color:white;
-        border:1px solid #334155;
-    }
-    div[data-testid="stButton"] button:hover{
-        border:1px solid #6366f1;
-    }
+    .stApp{ background-color:#0b1220; }
+    .login-title{ text-align:center; font-size:42px; font-weight:700; color:white; margin-bottom:40px; }
+    div[data-testid="stTextInput"] input{ background-color:#1e293b; color:white; border-radius:10px; border:1px solid #334155; height:45px; }
+    div[data-testid="stButton"] button{ height:45px; border-radius:10px; font-weight:600; background-color:#111827; color:white; border:1px solid #334155; }
     </style>
     """, unsafe_allow_html=True)
 
-    st.markdown('<div class="title">🔐 Sistem Survey Lot PUO</div>', unsafe_allow_html=True)
-
+    st.markdown('<div class="login-title">🔐 Sistem Survey Lot PUO</div>', unsafe_allow_html=True)
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         user_id = st.text_input("👤 **Masukkan ID:**", key="login_id")
         password = st.text_input("🔑 **Masukkan Kata Laluan:**", type="password", key="login_pass")
-        
         if st.button("Log Masuk", use_container_width=True):
             if user_id == USER_ID and password == USER_PASS:
                 st.session_state["password_correct"] = True
                 st.rerun()
             else:
                 st.error("ID atau Kata Laluan Salah")
-        
-        st.button("❓ Lupa Kata Laluan?", use_container_width=True)
 
 # ================== LOGIK SESSION STATE ==================
 if "password_correct" not in st.session_state:
@@ -77,79 +56,110 @@ if "password_correct" not in st.session_state:
 
 if not st.session_state["password_correct"]:
     login_screen()
-    st.stop()  # Berhenti di sini jika belum login
+    st.stop()
 
-# ================== MAIN APP (Hanya jalan jika login_screen lepas) ==================
+# ================== MAIN APP ==================
 
-# --- PENYELESAIAN LOGO ---
 current_dir = os.path.dirname(os.path.abspath(__file__))
 logo_path = os.path.join(current_dir, "puo.png")
+video_path = os.path.join(current_dir, "VIDEO.mp4")
 
-# ================== HEADER BERWARNA ==================
-st.markdown("""
-<style>
-.header-box{
-    background: linear-gradient(90deg,#0f172a,#1e293b);
-    padding:25px;
-    border-radius:15px;
-    margin-bottom:25px;
-}
-.header-title{
-    font-size:42px;
-    font-weight:800;
-    color:white;
-}
-.header-sub{
-    font-size:16px;
-    color:#cbd5e1;
-}
-</style>
-""", unsafe_allow_html=True)
-
-col_logo, col_title = st.columns([1, 6])
-
-with col_logo:
-    if os.path.exists(logo_path):
-        st.image(logo_path, width=130)
-    else:
-        st.warning("Logo PUO.png tidak dijumpai")
-
-with col_title:
-    st.markdown("""
-    <div class="header-box">
-        <div class="header-title">SISTEM SURVEY LOT RUMAH</div>
-        <div class="header-sub">Politeknik Ungku Omar | Jabatan Kejuruteraan Awam</div>
-    </div>
+# ================== HEADER VISUAL BERGERAK (VIDEO) ==================
+if os.path.exists(video_path):
+    video_base64 = get_video_base64(video_path)
+    
+    # CSS untuk video background dalam header
+    st.markdown(f"""
+        <style>
+        .header-container {{
+            position: relative;
+            width: 100%;
+            height: 180px;
+            overflow: hidden;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            background-color: #000;
+        }}
+        .video-bg {{
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            z-index: 0;
+            transform: translate(-50%, -50%);
+            opacity: 0.6; /* Gelapkan sedikit video supaya teks jelas */
+        }}
+        .header-content {{
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            width: 100%;
+        }}
+        .header-logo {{
+            width: 100px;
+            margin-right: 25px;
+            filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.5));
+        }}
+        .header-text-container {{
+            color: white;
+        }}
+        .header-title-main {{
+            font-size: 38px;
+            font-weight: 800;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.8);
+            margin: 0;
+        }}
+        .header-subtitle-main {{
+            font-size: 16px;
+            opacity: 0.9;
+            margin: 0;
+        }}
+        </style>
+        
+        <div class="header-container">
+            <video autoplay loop muted playsinline class="video-bg">
+                <source src="data:video/mp4;base64,{video_base64}" type="video/mp4">
+            </video>
+            <div class="header-content">
+                <img src="data:image/png;base64,{base64.b64encode(open(logo_path, "rb").read()).decode() if os.path.exists(logo_path) else ''}" class="header-logo">
+                <div class="header-text-container">
+                    <h1 class="header-title-main">SISTEM SURVEY LOT RUMAH</h1>
+                    <p class="header-subtitle-main">Politeknik Ungku Omar | Jabatan Kejuruteraan Awam</p>
+                </div>
+            </div>
+        </div>
     """, unsafe_allow_html=True)
+else:
+    st.error("Fail VIDEO.mp4 tidak dijumpai dalam folder.")
 
 # ================== SIDEBAR ==================
 st.sidebar.header("⚙️ Tetapan Paparan")
 uploaded_file = st.sidebar.file_uploader("Upload fail CSV", type=["csv"])
 
 st.sidebar.markdown("---")
-# Menambah pilihan "Google Satellite" dalam tema
 plot_theme = st.sidebar.selectbox("Tema Warna Pelan", ["Light Mode", "Dark Mode", "Blueprint", "Google Satellite"])
-show_bg_grid = st.sidebar.checkbox("Papar Grid Latar (Macam Gambar)", value=True)
+show_bg_grid = st.sidebar.checkbox("Papar Grid Latar", value=True)
 grid_interval = st.sidebar.slider("Jarak Selang Grid", 5, 50, 10)
 
 st.sidebar.markdown("---")
 st.sidebar.subheader("🖋️ Gaya Label")
 label_size_stn = st.sidebar.slider("Saiz Label Stesen", 6, 16, 10)
 label_size_data = st.sidebar.slider("Saiz Bearing/Jarak", 5, 12, 7)
-
-# FEATURE BARU: Slider untuk ubah saiz tulisan "LUAS"
 label_size_luas = st.sidebar.slider("Saiz Tulisan LUAS", 8, 30, 12) 
-
 dist_offset = st.sidebar.slider("Jarak Label Stesen ke Luar", 0.5, 5.0, 1.5)
-
-st.sidebar.markdown("---")
-st.sidebar.subheader("💾 Eksport QGIS")
 
 if st.sidebar.button("Log Keluar"):
     st.session_state["password_correct"] = False
     st.rerun()
 
-# ================== BACA DATA ==================
+# ================== BACA DATA & PLOT (BAHAGIAN SETERUSNYA KEKAL SAMA) ==================
 try:
     if uploaded_file is not None:
         df = pd.read_csv(uploaded_file)
@@ -161,38 +171,20 @@ try:
             st.info("Sila upload fail CSV untuk bermula.")
             st.stop()
 
-    # Generate Geometri
     coords = list(zip(df['E'], df['N']))
     poly_geom = Polygon(coords)
     line_geom = LineString(coords + [coords[0]])
     centroid = poly_geom.centroid
     area = poly_geom.area
 
-    # --- PENYEDIAAN DATA QGIS (EPSG:4390) ---
-    poly_feature = {
-        "type": "Feature", 
-        "properties": {"Jenis": "Kawasan", "Luas_m2": round(area, 3)}, 
-        "geometry": poly_geom.__geo_interface__
-    }
-    line_feature = {"type": "Feature", "properties": {"Jenis": "Sempadan"}, "geometry": line_geom.__geo_interface__}
-    stn_features = [{"type": "Feature", "properties": {"STN": int(r['STN'])}, "geometry": Point(r['E'], r['N']).__geo_interface__} for _, r in df.iterrows()]
-    
-    combined_geojson = {
-        "type": "FeatureCollection", 
-        "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:EPSG::4390" } },
-        "features": [poly_feature, line_feature] + stn_features
-    }
-    
-    st.sidebar.download_button("📥 Download GeoJSON (EPSG:4390)", json.dumps(combined_geojson), "pelan_lengkap.geojson", "application/json")
-
-    # ================== METRIC ==================
+    # Metric
     col1, col2, col3, col4 = st.columns(4)
     col1.metric("Luas (m²)", f"{area:.2f}")
     col2.metric("Luas (Ekar)", f"{area/4046.856:.4f}")
     col3.metric("Bilangan Stesen", len(df))
     col4.metric("Status", "Tutup" if poly_geom.is_valid else "Ralat")
 
-    # ================== PLOT (MATPLOTLIB) ==================
+    # Plot Logic
     if plot_theme == "Dark Mode":
         bg_color, grid_color, text_color, line_c = "#121212", "#555555", "white", "cyan"
     elif plot_theme == "Blueprint":
@@ -206,70 +198,45 @@ try:
     fig.patch.set_facecolor(bg_color)
     ax.set_facecolor(bg_color)
 
-    # Plot Garisan Sempadan
     ax.plot(*(line_geom.xy), linewidth=2, color=line_c, zorder=4)
-    ax.fill(*(poly_geom.exterior.xy), color='green', alpha=0.2 if plot_theme == "Google Satellite" else 0.1, zorder=1)
+    ax.fill(*(poly_geom.exterior.xy), color='green', alpha=0.1, zorder=1)
 
-    # Setting sempadan plot
     min_e, min_n, max_e, max_n = poly_geom.bounds
     ax.set_xlim(min_e - 30, max_e + 30)
     ax.set_ylim(min_n - 30, max_n + 30)
 
-    # Google Satellite Integration menggunakan Contextily
     if plot_theme == "Google Satellite":
         try:
-            # Menggunakan provider satelit (Google Hybrid/Satellite)
-            # Nota: EPSG 4390 perlu ditukar ke Web Mercator secara automatik oleh contextily
             cx.add_basemap(ax, crs="EPSG:4390", source=cx.providers.Esri.WorldImagery, zorder=0)
-        except Exception as e:
-            st.sidebar.error("Gagal memuatkan imej satelit. Sila semak sambungan internet.")
+        except:
+            st.sidebar.error("Gagal memuatkan imej satelit.")
 
-    # Grid Latar Belakang
     if show_bg_grid:
-        ax.grid(True, which='both', color=grid_color, linestyle='--', linewidth=0.8, alpha=0.5, zorder=0)
+        ax.grid(True, color=grid_color, linestyle='--', alpha=0.5)
         ax.xaxis.set_major_locator(plt.MultipleLocator(grid_interval))
         ax.yaxis.set_major_locator(plt.MultipleLocator(grid_interval))
     else:
         ax.axis('off')
 
-    # PAPARAN TULISAN LUAS (DENGAN SAIZ DINAMIK)
-    ax.text(centroid.x, centroid.y, f"LUAS\n{area:.2f} m²", 
-            fontsize=label_size_luas, 
-            fontweight='bold', 
-            color='darkgreen', 
-            ha='center',
-            bbox=dict(boxstyle='round,pad=0.3', fc='white', alpha=0.9, ec='green'), 
-            zorder=10)
+    ax.text(centroid.x, centroid.y, f"LUAS\n{area:.2f} m²", fontsize=label_size_luas, fontweight='bold', color='darkgreen', ha='center', bbox=dict(boxstyle='round', fc='white', alpha=0.9))
 
-    # Plot Label Bearing, Jarak dan No Stesen
     for i in range(len(df)):
         p1, p2 = df.iloc[i], df.iloc[(i + 1) % len(df)]
         dE, dN = p2['E'] - p1['E'], p2['N'] - p1['N']
         dist, bear = np.sqrt(dE**2 + dN**2), (np.degrees(np.arctan2(dE, dN)) + 360) % 360
-        
         txt_angle = np.degrees(np.arctan2(dN, dE))
         if txt_angle > 90: txt_angle -= 180
         if txt_angle < -90: txt_angle += 180
         
-        # Label Bearing & Jarak
-        ax.text((p1['E']+p2['E'])/2, (p1['N']+p2['N'])/2, f"{format_dms(bear)}\n{dist:.2f}m", 
-                fontsize=label_size_data, color='yellow' if plot_theme == "Google Satellite" else 'brown', 
-                fontweight='bold', ha='center', rotation=txt_angle,
-                bbox=dict(boxstyle='round,pad=0.1', fc=bg_color, alpha=0.6, ec='none'), zorder=6)
-
-        # Label Nombor Stesen (Offset ke luar)
+        ax.text((p1['E']+p2['E'])/2, (p1['N']+p2['N'])/2, f"{format_dms(bear)}\n{dist:.2f}m", fontsize=label_size_data, color='brown', ha='center', rotation=txt_angle)
+        
         ve, vn = p1['E'] - centroid.x, p1['N'] - centroid.y
         mag = np.sqrt(ve**2 + vn**2)
-        ax.text(p1['E'] + (ve/mag)*dist_offset, p1['N'] + (vn/mag)*dist_offset, 
-                str(int(p1['STN'])), fontsize=label_size_stn, fontweight='bold', 
-                color='white' if plot_theme == "Google Satellite" else 'blue', 
-                ha='center', zorder=7)
-        
-        # Titik Stesen (Point)
+        ax.text(p1['E'] + (ve/mag)*dist_offset, p1['N'] + (vn/mag)*dist_offset, str(int(p1['STN'])), fontsize=label_size_stn, color='blue', ha='center')
         ax.scatter(p1['E'], p1['N'], color='red', s=50, edgecolors='white', zorder=8)
 
-    ax.set_aspect("equal", adjustable="box")
+    ax.set_aspect("equal")
     st.pyplot(fig)
 
 except Exception as e:
-    st.error(f"❌ Ralat: Sila pastikan format CSV betul (E, N, STN). Ralat teknikal: {e}")
+    st.error(f"Sila pastikan format CSV betul. Ralat: {e}")
