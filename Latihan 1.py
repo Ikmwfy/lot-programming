@@ -5,6 +5,7 @@ import numpy as np
 from shapely.geometry import Polygon, Point, LineString
 import json
 import os
+import contextily as cx # Perlu install: pip install contextily xyzservices
 
 # Set config halaman (Mesti berada di baris pertama selepas import)
 st.set_page_config(page_title="Visualisasi Poligon Pro", layout="wide")
@@ -126,7 +127,8 @@ st.sidebar.header("⚙️ Tetapan Paparan")
 uploaded_file = st.sidebar.file_uploader("Upload fail CSV", type=["csv"])
 
 st.sidebar.markdown("---")
-plot_theme = st.sidebar.selectbox("Tema Warna Pelan", ["Light Mode", "Dark Mode", "Blueprint"])
+# Menambah pilihan "Google Satellite" dalam tema
+plot_theme = st.sidebar.selectbox("Tema Warna Pelan", ["Light Mode", "Dark Mode", "Blueprint", "Google Satellite"])
 show_bg_grid = st.sidebar.checkbox("Papar Grid Latar (Macam Gambar)", value=True)
 grid_interval = st.sidebar.slider("Jarak Selang Grid", 5, 50, 10)
 
@@ -166,13 +168,22 @@ try:
     centroid = poly_geom.centroid
     area = poly_geom.area
 
-    # --- PENYEDIAAN DATA QGIS ---
-    poly_feature = {"type": "Feature", "properties": {"Jenis": "Kawasan", "Luas_m2": round(area, 3)}, "geometry": poly_geom.__geo_interface__}
+    # --- PENYEDIAAN DATA QGIS (EPSG:4390) ---
+    poly_feature = {
+        "type": "Feature", 
+        "properties": {"Jenis": "Kawasan", "Luas_m2": round(area, 3)}, 
+        "geometry": poly_geom.__geo_interface__
+    }
     line_feature = {"type": "Feature", "properties": {"Jenis": "Sempadan"}, "geometry": line_geom.__geo_interface__}
     stn_features = [{"type": "Feature", "properties": {"STN": int(r['STN'])}, "geometry": Point(r['E'], r['N']).__geo_interface__} for _, r in df.iterrows()]
-    combined_geojson = {"type": "FeatureCollection", "features": [poly_feature, line_feature] + stn_features}
     
-    st.sidebar.download_button("📥 Download GeoJSON", json.dumps(combined_geojson), "pelan_lengkap.geojson", "application/json")
+    combined_geojson = {
+        "type": "FeatureCollection", 
+        "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:EPSG::4390" } },
+        "features": [poly_feature, line_feature] + stn_features
+    }
+    
+    st.sidebar.download_button("📥 Download GeoJSON (EPSG:4390)", json.dumps(combined_geojson), "pelan_lengkap.geojson", "application/json")
 
     # ================== METRIC ==================
     col1, col2, col3, col4 = st.columns(4)
@@ -186,6 +197,8 @@ try:
         bg_color, grid_color, text_color, line_c = "#121212", "#555555", "white", "cyan"
     elif plot_theme == "Blueprint":
         bg_color, grid_color, text_color, line_c = "#003366", "#004080", "white", "yellow"
+    elif plot_theme == "Google Satellite":
+        bg_color, grid_color, text_color, line_c = "black", "white", "white", "#00FF00"
     else:
         bg_color, grid_color, text_color, line_c = "#ffffff", "#aaaaaa", "black", "black"
 
@@ -195,14 +208,25 @@ try:
 
     # Plot Garisan Sempadan
     ax.plot(*(line_geom.xy), linewidth=2, color=line_c, zorder=4)
-    ax.fill(*(poly_geom.exterior.xy), color='green', alpha=0.1, zorder=1)
+    ax.fill(*(poly_geom.exterior.xy), color='green', alpha=0.2 if plot_theme == "Google Satellite" else 0.1, zorder=1)
+
+    # Setting sempadan plot
+    min_e, min_n, max_e, max_n = poly_geom.bounds
+    ax.set_xlim(min_e - 30, max_e + 30)
+    ax.set_ylim(min_n - 30, max_n + 30)
+
+    # Google Satellite Integration menggunakan Contextily
+    if plot_theme == "Google Satellite":
+        try:
+            # Menggunakan provider satelit (Google Hybrid/Satellite)
+            # Nota: EPSG 4390 perlu ditukar ke Web Mercator secara automatik oleh contextily
+            cx.add_basemap(ax, crs="EPSG:4390", source=cx.providers.Esri.WorldImagery, zorder=0)
+        except Exception as e:
+            st.sidebar.error("Gagal memuatkan imej satelit. Sila semak sambungan internet.")
 
     # Grid Latar Belakang
     if show_bg_grid:
-        min_e, min_n, max_e, max_n = poly_geom.bounds
-        ax.set_xlim(np.floor(min_e/10)*10 - 20, np.ceil(max_e/10)*10 + 20)
-        ax.set_ylim(np.floor(min_n/10)*10 - 20, np.ceil(max_n/10)*10 + 20)
-        ax.grid(True, which='both', color=grid_color, linestyle='--', linewidth=0.8, alpha=0.7, zorder=0)
+        ax.grid(True, which='both', color=grid_color, linestyle='--', linewidth=0.8, alpha=0.5, zorder=0)
         ax.xaxis.set_major_locator(plt.MultipleLocator(grid_interval))
         ax.yaxis.set_major_locator(plt.MultipleLocator(grid_interval))
     else:
@@ -223,24 +247,26 @@ try:
         dE, dN = p2['E'] - p1['E'], p2['N'] - p1['N']
         dist, bear = np.sqrt(dE**2 + dN**2), (np.degrees(np.arctan2(dE, dN)) + 360) % 360
         
-        # Kira sudut pusingan teks supaya selari dengan garisan
         txt_angle = np.degrees(np.arctan2(dN, dE))
         if txt_angle > 90: txt_angle -= 180
         if txt_angle < -90: txt_angle += 180
         
         # Label Bearing & Jarak
         ax.text((p1['E']+p2['E'])/2, (p1['N']+p2['N'])/2, f"{format_dms(bear)}\n{dist:.2f}m", 
-                fontsize=label_size_data, color='brown', fontweight='bold', ha='center', rotation=txt_angle,
-                bbox=dict(boxstyle='round,pad=0.1', fc=bg_color, alpha=0.4, ec='none'), zorder=6)
+                fontsize=label_size_data, color='yellow' if plot_theme == "Google Satellite" else 'brown', 
+                fontweight='bold', ha='center', rotation=txt_angle,
+                bbox=dict(boxstyle='round,pad=0.1', fc=bg_color, alpha=0.6, ec='none'), zorder=6)
 
         # Label Nombor Stesen (Offset ke luar)
         ve, vn = p1['E'] - centroid.x, p1['N'] - centroid.y
         mag = np.sqrt(ve**2 + vn**2)
         ax.text(p1['E'] + (ve/mag)*dist_offset, p1['N'] + (vn/mag)*dist_offset, 
-                str(int(p1['STN'])), fontsize=label_size_stn, fontweight='bold', color='blue', ha='center', zorder=7)
+                str(int(p1['STN'])), fontsize=label_size_stn, fontweight='bold', 
+                color='white' if plot_theme == "Google Satellite" else 'blue', 
+                ha='center', zorder=7)
         
         # Titik Stesen (Point)
-        ax.scatter(p1['E'], p1['N'], color='red', s=50, edgecolors='black', zorder=8)
+        ax.scatter(p1['E'], p1['N'], color='red', s=50, edgecolors='white', zorder=8)
 
     ax.set_aspect("equal", adjustable="box")
     st.pyplot(fig)
