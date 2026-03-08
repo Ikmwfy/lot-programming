@@ -1,4 +1,7 @@
 import streamlit as st
+# ... import yang lain ...
+
+st.set_page_config(layout="wide") # TAMBAH BARIS INI
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -10,23 +13,18 @@ from streamlit_folium import st_folium
 from pyproj import Transformer
 import base64
 
-# Configuration must be the first Streamlit command
-st.set_page_config(layout="wide")
-
 def get_video_base64(video_file):
-    with open(video_file, "rb") as f:
-        data = f.read()
-    return base64.b64encode(data).decode()
+    with open(video_file, "rb") as f:
+        data = f.read()
+    return base64.b64encode(data).decode()
 
 # ================== FUNGSI TUKAR DMS ==================
 def format_dms(decimal_degree):
-    d = int(decimal_degree)
-    m = int((decimal_degree - d) * 60)
-    s = round((((decimal_degree - d) * 60) - m) * 60, 0)
-    return f"{d}°{abs(m):02d}'{abs(int(s)):02d}\""
+    d = int(decimal_degree)
+    m = int((decimal_degree - d) * 60)
+    s = round((((decimal_degree - d) * 60) - m) * 60, 0)
+    return f"{d}°{abs(m):02d}'{abs(int(s)):02d}\""
 
-# ... (Rest of your functions: reset_password_dialog, check_password)
-# ... (Ensure you apply standard 4-space indentation throughout the rest of your file)
 # ================== FUNGSI LOGIN & KEMASKINI ==================
 @st.dialog("🔑 Kemaskini Kata Laluan")
 def reset_password_dialog():
