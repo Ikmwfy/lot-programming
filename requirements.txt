@@ -7,3 +7,4 @@ folium
 streamlit-folium
 pyproj
 streamlit
+base64
