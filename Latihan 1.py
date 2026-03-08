@@ -213,9 +213,19 @@ if check_password():
     st.sidebar.header("⚙️ Tetapan Paparan")
     uploaded_file = st.sidebar.file_uploader("Upload fail CSV", type=["csv"])
 
+    # ... (kod asal di bahagian sidebar)
     st.sidebar.markdown("---")
     st.sidebar.subheader("🌍 Mod Peta Interaktif")
-    show_interactive_map = st.sidebar.toggle("On/Off Peta Satelit", value=False)
+    
+    # Tukar kepada session_state supaya ia boleh dikawal secara dinamik
+    if "show_map" not in st.session_state:
+        st.session_state.show_map = False
+        
+    show_interactive_map = st.sidebar.toggle("On/Off Peta Satelit", value=st.session_state.show_map)
+    
+    # Kemaskini session_state berdasarkan input pengguna
+    st.session_state.show_map = show_interactive_map
+    
     map_provider = st.sidebar.radio("Pilih Jenis Peta:", ["Satelit (Hybrid)", "Standard Map"], disabled=not show_interactive_map)
 
     # --- PILIHAN WARNA ---
@@ -239,9 +249,14 @@ if check_password():
     dist_offset = st.sidebar.slider("Jarak Label Stesen ke Luar", 0.5, 5.0, 1.5)
 
     # ================== BACA DATA ==================
+    # ================== BACA DATA ==================
     if uploaded_file is not None:
+        # PAKSA PETA TERBUKA (AUTO-OPEN)
+        st.session_state.show_map = True 
+        
         try:
             df = pd.read_csv(uploaded_file)
+            # ... (baki kod bacaan data anda)
             
             if all(col in df.columns for col in ['STN', 'E', 'N']):
                 
@@ -359,6 +374,7 @@ if check_password():
             else: st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
 
         except Exception as e: st.error(f"❌ Ada ralat: {e}")
+
 
 
 
