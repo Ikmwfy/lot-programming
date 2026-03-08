@@ -166,34 +166,52 @@ if check_password():
                 st.subheader("📐 Paparan Pelan Ukur")
 
                 if show_interactive_map:
-                    # --- MOD PETA INTERAKTIF ---
-                    google_map_url = 'https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}'
-                    if map_provider == "Standard Map":
-                        google_map_url = 'https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}'
+                  # --- MOD PETA INTERAKTIF ---
+                google_map_url = 'https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}'
+                if map_provider == "Standard Map":
+                    google_map_url = 'https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}'
 
-                    m = folium.Map(location=[df['lat'].mean(), df['lon'].mean()], zoom_start=20, max_zoom=22, tiles=google_map_url, attr='Google')
-                    points_map = [[r['lat'], r['lon']] for _, r in df.iterrows()]
+                m = folium.Map(location=[df['lat'].mean(), df['lon'].mean()], zoom_start=20, max_zoom=22, tiles=google_map_url, attr='Google')
+                points_map = [[r['lat'], r['lon']] for _, r in df.iterrows()]
+                
+                # --- POPUP UNTUK LOT ---
+                lot_info = f"<b>INFO LOT</b><br>Luas: {area:.2f} m²<br>Bilangan Stesen: {len(df)}"
+                folium.Polygon(
+                    locations=points_map, 
+                    color=line_color, 
+                    weight=3, 
+                    fill=True, 
+                    fill_color=poly_color, 
+                    fill_opacity=poly_opacity,
+                    popup=folium.Popup(lot_info, max_width=200)
+                ).add_to(m)
+                
+                for i in range(len(df)):
+                    p1, p2 = df.iloc[i], df.iloc[(i + 1) % len(df)]
+                    dE, dN = p2['E'] - p1['E'], p2['N'] - p1['N']
+                    dist, bear = np.sqrt(dE**2 + dN**2), (np.degrees(np.arctan2(dE, dN)) + 360) % 360
+                    angle = -np.degrees(np.arctan2(p2['lat'] - p1['lat'], p2['lon'] - p1['lon']))
+                    if angle > 90: angle -= 180
+                    elif angle < -90: angle += 180
                     
-                    folium.Polygon(locations=points_map, color=line_color, weight=3, fill=True, fill_color=poly_color, fill_opacity=poly_opacity).add_to(m)
+                    # --- POPUP UNTUK STESEN ---
+                    stn_info = f"<b>STESEN {int(p1['STN'])}</b><br>E: {p1['E']:.3f}<br>N: {p1['N']:.3f}"
                     
-                    for i in range(len(df)):
-                        p1, p2 = df.iloc[i], df.iloc[(i + 1) % len(df)]
-                        dE, dN = p2['E'] - p1['E'], p2['N'] - p1['N']
-                        dist, bear = np.sqrt(dE**2 + dN**2), (np.degrees(np.arctan2(dE, dN)) + 360) % 360
-                        angle = -np.degrees(np.arctan2(p2['lat'] - p1['lat'], p2['lon'] - p1['lon']))
-                        if angle > 90: angle -= 180
-                        elif angle < -90: angle += 180
-                        
-                        v_offset = -20 if dN >= 0 else -10
-                        folium.Marker([ (p1['lat'] + p2['lat']) / 2, (p1['lon'] + p2['lon']) / 2],
-                            icon=folium.DivIcon(html=f'''<div style="transform: rotate({angle}deg); text-align: center; width: 160px; margin-left: -80px; margin-top: {v_offset}px;">
-                                <div style="font-size: {label_size_data}pt; color: white; text-shadow: 2px 2px 3px black; font-weight: bold;">{format_dms(bear)}<br><span style="color: #FFD700;">{dist:.2f}m</span></div></div>''')).add_to(m)
-                        
-                        folium.Marker([p1['lat'], p1['lon']], icon=folium.DivIcon(html=f'''<div style="background-color: white; border: 2px solid red; border-radius: 50%; width: {label_size_stn}px; height: {label_size_stn}px; display: flex; align-items: center; justify-content: center; font-size: {label_size_stn*0.6}px; font-weight: bold; color: black; margin-left: -{label_size_stn/2}px; margin-top: -{label_size_stn/2}px; box-shadow: 1px 1px 3px rgba(0,0,0,0.5);">{int(p1["STN"])}</div>''')).add_to(m)
+                    v_offset = -20 if dN >= 0 else -10
+                    folium.Marker([ (p1['lat'] + p2['lat']) / 2, (p1['lon'] + p2['lon']) / 2],
+                        icon=folium.DivIcon(html=f'''<div style="transform: rotate({angle}deg); text-align: center; width: 160px; margin-left: -80px; margin-top: {v_offset}px;">
+                            <div style="font-size: {label_size_data}pt; color: white; text-shadow: 2px 2px 3px black; font-weight: bold;">{format_dms(bear)}<br><span style="color: #FFD700;">{dist:.2f}m</span></div></div>''')).add_to(m)
+                    
+                    # Menambah marker dengan popup
+                    folium.Marker(
+                        [p1['lat'], p1['lon']], 
+                        popup=folium.Popup(stn_info, max_width=150),
+                        icon=folium.DivIcon(html=f'''<div style="background-color: white; border: 2px solid red; border-radius: 50%; width: {label_size_stn}px; height: {label_size_stn}px; display: flex; align-items: center; justify-content: center; font-size: {label_size_stn*0.6}px; font-weight: bold; color: black; margin-left: -{label_size_stn/2}px; margin-top: -{label_size_stn/2}px; box-shadow: 1px 1px 3px rgba(0,0,0,0.5);">{int(p1["STN"])}</div>''')
+                    ).add_to(m)
 
-                    if show_luas_label:
-                        folium.Marker([df['lat'].mean(), df['lon'].mean()], icon=folium.DivIcon(html=f'<div style="font-size: {label_size_luas}pt; color: #00FF00; text-shadow: 3px 3px 5px black; font-weight: 900; width: 250px; text-align: center; margin-left: -125px;">{area:.2f} m²</div>')).add_to(m)
-                    folium_static(m, width=900, height=550)
+                if show_luas_label:
+                    folium.Marker([df['lat'].mean(), df['lon'].mean()], icon=folium.DivIcon(html=f'<div style="font-size: {label_size_luas}pt; color: #00FF00; text-shadow: 3px 3px 5px black; font-weight: 900; width: 250px; text-align: center; margin-left: -125px;">{area:.2f} m²</div>')).add_to(m)
+                folium_static(m, width=900, height=550)
 
                 else:
                     # --- MOD MATPLOTLIB ---
@@ -235,6 +253,7 @@ if check_password():
             else: st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
 
         except Exception as e: st.error(f"❌ Ada ralat: {e}")
+
 
 
 
