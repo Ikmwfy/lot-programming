@@ -41,7 +41,7 @@ def check_password():
             st.markdown("<br>", unsafe_allow_html=True)
             
             if st.button("Log Masuk", use_container_width=True):
-                if user_id == "zed" and password == "admin123":
+                if user_id == "67" and password == "ikmalkacak":
                     st.session_state["password_correct"] = True
                     st.rerun()
                 else:
@@ -235,3 +235,4 @@ if check_password():
             else: st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
 
         except Exception as e: st.error(f"❌ Ada ralat: {e}")
+
