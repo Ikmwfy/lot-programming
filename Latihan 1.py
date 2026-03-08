@@ -85,8 +85,6 @@ if check_password():
 
         # Pastikan st.markdown ini selari dengan baris 'if' di atas
         st.markdown(f"""
-</style>
-""", unsafe_allow_html=True)
             <style>
             .header-container {{
                 position: relative; 
@@ -290,6 +288,7 @@ if check_password():
             else: st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
 
         except Exception as e: st.error(f"❌ Ada ralat: {e}")
+
 
 
 
