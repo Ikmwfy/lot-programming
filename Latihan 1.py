@@ -69,12 +69,56 @@ if check_password():
     logo_path = "PUO.png"
 
     # --- 👤 PROFIL PENGGUNA (SIDEBAR) ---
-    st.sidebar.markdown("""
-        <div style="background: linear-gradient(135deg, #00B4DB, #0083B0); padding: 20px; border-radius: 15px; text-align: center; margin-bottom: 20px;">
-            <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" width="80" style="border-radius: 50%; border: 3px solid white;">
-            <h3 style="color: white; margin-top: 10px; font-family: sans-serif;">Hai, Malfoy!</h3>
-            <p style="color: #e0e0e0; font-size: 0.8em; margin-bottom: 0px;">Student</p>
+    bg_video_base64 = get_video_base64("BACKGROUND.mp4")
+    
+    with open("ICON.png", "rb") as f:
+        icon_base64 = base64.b64encode(f.read()).decode()
+
+    st.sidebar.markdown(f"""
+        <div class="sidebar-profile-container">
+            <video autoplay loop muted playsinline class="sidebar-video-bg">
+                <source src="data:video/mp4;base64,{bg_video_base64}" type="video/mp4">
+            </video>
+            <div class="sidebar-profile-content">
+                <img src="data:image/png;base64,{icon_base64}" class="sidebar-icon">
+                <h3 style="color: white; margin-top: 10px; font-family: sans-serif;">Hai, Malfoy!</h3>
+                <p style="color: #e0e0e0; font-size: 0.8em;">Student</p>
+            </div>
         </div>
+        <style>
+        .sidebar-profile-container {{
+            position: relative;
+            width: 100%;
+            height: 200px;
+            border-radius: 15px;
+            overflow: hidden;
+            text-align: center;
+            margin-bottom: 20px;
+        }}
+        .sidebar-video-bg {{
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 0;
+        }}
+        .sidebar-profile-content {{
+            position: relative;
+            z-index: 1;
+            padding-top: 40px;
+            background: rgba(0, 0, 0, 0.4); /* Gelapkan sedikit untuk nampak teks */
+            height: 100%;
+        }}
+        .sidebar-icon {{
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 3px solid white;
+            object-fit: cover;
+        }}
+        </style>
     """, unsafe_allow_html=True)
 
     # --- HEADER VISUAL BERGERAK (VIDEO) ---
@@ -291,6 +335,7 @@ if check_password():
             else: st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
 
         except Exception as e: st.error(f"❌ Ada ralat: {e}")
+
 
 
 
