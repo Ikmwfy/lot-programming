@@ -100,6 +100,9 @@ if check_password():
     display: flex;
     align-items: center;
 }}
+/* ... (kod CSS anda yang lain) ... */
+</style>
+""", unsafe_allow_html=True)
 </style>
 """, unsafe_allow_html=True)
             <style>
@@ -305,6 +308,7 @@ if check_password():
             else: st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
 
         except Exception as e: st.error(f"❌ Ada ralat: {e}")
+
 
 
 
