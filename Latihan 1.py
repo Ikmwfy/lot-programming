@@ -210,45 +210,32 @@ if check_password():
     st.markdown("<hr style='border: 1px solid #eee; margin-top: 0px;'>", unsafe_allow_html=True)
 
     # ================== SIDEBAR SETTINGS ==================
+    # Sidebar
     st.sidebar.header("⚙️ Tetapan Paparan")
     uploaded_file = st.sidebar.file_uploader("Upload fail CSV", type=["csv"])
 
-    # ... (kod asal di bahagian sidebar)
-    st.sidebar.markdown("---")
-    st.sidebar.subheader("🌍 Mod Peta Interaktif")
-    
-    # Tukar kepada session_state supaya ia boleh dikawal secara dinamik
-    if "show_map" not in st.session_state:
-        st.session_state.show_map = False
-        
-    show_interactive_map = st.sidebar.toggle("On/Off Peta Satelit", value=st.session_state.show_map)
-    
-    # Kemaskini session_state berdasarkan input pengguna
-    st.session_state.show_map = show_interactive_map
-    
-    map_provider = st.sidebar.radio("Pilih Jenis Peta:", ["Satelit (Hybrid)", "Standard Map"], disabled=not show_interactive_map)
+    # Eksport Data (dalam expander)
+    if uploaded_file:
+        with st.sidebar.expander("💾 Eksport & Analisis", expanded=True):
+            # Kod Eksport QGIS anda di sini
+            st.success("✅ Fail bersedia untuk diproses.")
+            
+            # Statistik Pantas (st.metric)
+            st.metric("Jumlah Luas", f"{area:.2f} m²")
+            st.metric("Jumlah Stesen", len(df))
 
-    # --- PILIHAN WARNA ---
-    st.sidebar.markdown("---")
-    st.sidebar.subheader("🎨 Pilihan Warna")
-    poly_color = st.sidebar.color_picker("Warna Kawasan (Poligon)", "#6036AF") 
-    line_color = st.sidebar.color_picker("Warna Garisan Sempadan", "#FFFF00") 
-    poly_opacity = st.sidebar.slider("Kelegapan Kawasan", 0.0, 1.0, 0.3)
+    # Tetapan Visual
+    with st.sidebar.expander("🎨 Tetapan Visual & Warna"):
+        poly_color = st.color_picker("Warna Kawasan", "#6036AF")
+        line_color = st.color_picker("Warna Garisan", "#FFFF00")
+        poly_opacity = st.slider("Kelegapan", 0.0, 1.0, 0.3)
 
-    st.sidebar.markdown("---")
-    plot_theme = st.sidebar.selectbox("Tema Warna Pelan Matplotlib", ["Light Mode", "Dark Mode", "Blueprint"])
-    show_bg_grid = st.sidebar.checkbox("Papar Grid Latar", value=True)
-    grid_interval = st.sidebar.slider("Jarak Selang Grid", 5, 50, 10)
+    # Tetapan Label
+    with st.sidebar.expander("🖋️ Gaya Label & Grid"):
+        show_luas_label = st.checkbox("Papar Label LUAS", True)
+        label_size_stn = st.slider("Saiz Bulatan Stesen", 15, 30, 22)
+        label_size_luas = st.slider("Saiz Tulisan LUAS", 8, 30, 14)
 
-    st.sidebar.markdown("---")
-    st.sidebar.subheader("🖋️ Gaya Label")
-    show_luas_label = st.sidebar.checkbox("Papar Label LUAS", value=True)
-    label_size_stn = st.sidebar.slider("Saiz Bulatan Stesen", 15, 30, 22) 
-    label_size_data = st.sidebar.slider("Saiz Bearing/Jarak", 5, 12, 7)
-    label_size_luas = st.sidebar.slider("Saiz Tulisan LUAS", 8, 30, 14) 
-    dist_offset = st.sidebar.slider("Jarak Label Stesen ke Luar", 0.5, 5.0, 1.5)
-
-    # ================== BACA DATA ==================
     # ================== BACA DATA ==================
     if uploaded_file is not None:
         # PAKSA PETA TERBUKA (AUTO-OPEN)
@@ -374,6 +361,7 @@ if check_password():
             else: st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
 
         except Exception as e: st.error(f"❌ Ada ralat: {e}")
+
 
 
 
