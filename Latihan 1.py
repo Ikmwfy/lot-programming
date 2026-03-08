@@ -71,7 +71,7 @@ if check_password():
     # --- 👤 PROFIL PENGGUNA (SIDEBAR) ---
     bg_video_base64 = get_video_base64("BACKGROUND.mp4")
     
-    with open("ICON.jpg", "rb") as f:
+    with open("ICON.jpeg", "rb") as f:
         icon_base64 = base64.b64encode(f.read()).decode()
 
     st.sidebar.markdown(f"""
@@ -335,6 +335,7 @@ if check_password():
             else: st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
 
         except Exception as e: st.error(f"❌ Ada ralat: {e}")
+
 
 
 
