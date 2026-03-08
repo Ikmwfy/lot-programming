@@ -66,78 +66,50 @@ if check_password():
         """, unsafe_allow_html=True
     )
 
-    # ================== HEADER VISUAL BERGERAK (VIDEO) ==================
-if os.path.exists(video_path):
-    video_base64 = get_video_base64(video_path)
-    
-    # CSS untuk video background dalam header
-    st.markdown(f"""
-        <style>
-        .header-container {{
-            position: relative;
-            width: 100%;
-            height: 180px;
-            overflow: hidden;
-            border-radius: 15px;
-            margin-bottom: 25px;
-            display: flex;
-            align-items: center;
-            background-color: #000;
-        }}
-        .video-bg {{
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            min-width: 100%;
-            min-height: 100%;
-            width: auto;
-            height: auto;
-            z-index: 0;
-            transform: translate(-50%, -50%);
-            opacity: 0.6; /* Gelapkan sedikit video supaya teks jelas */
-        }}
-        .header-content {{
-            position: relative;
-            z-index: 1;
-            display: flex;
-            align-items: center;
-            padding: 20px;
-            width: 100%;
-        }}
-        .header-logo {{
-            width: 100px;
-            margin-right: 25px;
-            filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.5));
-        }}
-        .header-text-container {{
-            color: white;
-        }}
-        .header-title-main {{
-            font-size: 38px;
-            font-weight: 800;
-            text-shadow: 2px 2px 8px rgba(0,0,0,0.8);
-            margin: 0;
-        }}
-        .header-subtitle-main {{
-            font-size: 16px;
-            opacity: 0.9;
-            margin: 0;
-        }}
-        </style>
-        
-        <div class="header-container">
-            <video autoplay loop muted playsinline class="video-bg">
-                <source src="data:video/mp4;base64,{video_base64}" type="video/mp4">
-            </video>
-            <div class="header-content">
-                <img src="data:image/png;base64,{base64.b64encode(open(logo_path, "rb").read()).decode() if os.path.exists(logo_path) else ''}" class="header-logo">
-                <div class="header-text-container">
-                    <h1 class="header-title-main">SISTEM SURVEY LOT RUMAH</h1>
-                    <p class="header-subtitle-main">Politeknik Ungku Omar | Jabatan Kejuruteraan Awam</p>
+with col_text:
+        # Menggunakan container untuk menjadikan video sebagai latar belakang teks
+        st.markdown("""
+            <style>
+                .header-container {
+                    position: relative;
+                    width: 100%;
+                    height: 200px; /* Laraskan ketinggian mengikut kesesuaian */
+                    overflow: hidden;
+                    border-radius: 10px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+                .header-video {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                    z-index: 1;
+                }
+                .header-content {
+                    position: relative;
+                    z-index: 2;
+                    background: rgba(100, 70, 50, 0.7); /* Warna coklat lutsinar seperti imej */
+                    padding: 20px;
+                    width: 100%;
+                    color: white;
+                }
+                .main-title { font-family: 'Arial Black', Gadget, sans-serif; font-size: 40px; font-weight: 900; margin: 0; line-height: 1; }
+                .sub-title { font-size: 18px; margin: 0; }
+            </style>
+            <div class="header-container">
+                <video class="header-video" autoplay loop muted playsinline>
+                    <source src="VIDEO.mp4" type="video/mp4">
+                </video>
+                <div class="header-content">
+                    <h1 class="main-title">SISTEM SURVEY LOT RUMAH</h1>
+                    <p class="sub-title">Politeknik Ungku Omar | Jabatan Kejuruteraan Awam</p>
                 </div>
             </div>
-        </div>
-    """, unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
     
     st.markdown("<hr style='border: 1px solid #eee; margin-top: 0px;'>", unsafe_allow_html=True)
 
@@ -291,3 +263,4 @@ if os.path.exists(video_path):
             else: st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
 
         except Exception as e: st.error(f"❌ Ada ralat: {e}")
+
