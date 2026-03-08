@@ -85,32 +85,28 @@ if check_password():
                 logo_base64 = base64.b64encode(image_file.read()).decode()
 
         st.markdown(f"""
-            # Pastikan kod CSS anda sentiasa dimulakan dengan st.markdown(f""" <style> ...
-    st.markdown(f"""
-        <style>
-        .header-container {{
-            position: relative; 
-            width: 100%; 
-            height: 180px; 
-            overflow: hidden;
-            border-radius: 15px; 
-            margin-bottom: 25px; 
-            margin-left: -40px; /* Laraskan nilai negatif ini untuk gerak ke kiri */
-            background-color: #000;
-        }}
-        .video-bg {{
-            position: absolute; 
-            top: 50%; 
-            left: 0; 
-            min-width: 100%;
-            min-height: 100%; 
-            width: auto; 
-            height: auto; 
-            z-index: 0;
-            transform: translateY(-50%); 
-            opacity: 0.6; 
-        }}
-</style>
+            <style>
+            .header-container {{
+                position: relative; 
+                width: 100%; 
+                height: 180px; 
+                overflow: hidden;
+                border-radius: 15px; 
+                margin-bottom: 25px; 
+                margin-left: -40px; /* Nilai negatif ini menarik header ke kiri */
+                background-color: #000;
+            }}
+            .video-bg {{
+                position: absolute; 
+                top: 50%; 
+                left: 0; 
+                min-width: 100%;
+                min-height: 100%; 
+                width: auto; 
+                height: auto; 
+                z-index: 0;
+                transform: translateY(-50%); 
+                opacity: 0.6; 
             }}
             .header-content {{
                 position: relative; z-index: 1; display: flex; align-items: center;
@@ -290,6 +286,7 @@ if check_password():
             else: st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
 
         except Exception as e: st.error(f"❌ Ada ralat: {e}")
+
 
 
 
