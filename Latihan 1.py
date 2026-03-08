@@ -66,14 +66,23 @@ if check_password():
         """, unsafe_allow_html=True
     )
 
-with col_text:
+    # --- BAHAGIAN HEADER UTAMA ---
+    col_logo, col_text = st.columns([1.2, 4])
+    
+    with col_logo:
+        if os.path.exists("PUO.png"):
+            st.image("PUO.png", width=180)
+        else:
+            st.warning("⚠️ Logo 'PUO.png' tidak dijumpai.")
+
+    with col_text:
         # Menggunakan container untuk menjadikan video sebagai latar belakang teks
         st.markdown("""
             <style>
                 .header-container {
                     position: relative;
                     width: 100%;
-                    height: 200px; /* Laraskan ketinggian mengikut kesesuaian */
+                    height: 200px;
                     overflow: hidden;
                     border-radius: 10px;
                     display: flex;
@@ -92,7 +101,7 @@ with col_text:
                 .header-content {
                     position: relative;
                     z-index: 2;
-                    background: rgba(100, 70, 50, 0.7); /* Warna coklat lutsinar seperti imej */
+                    background: rgba(100, 70, 50, 0.7);
                     padding: 20px;
                     width: 100%;
                     color: white;
@@ -263,4 +272,5 @@ with col_text:
             else: st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
 
         except Exception as e: st.error(f"❌ Ada ralat: {e}")
+
 
