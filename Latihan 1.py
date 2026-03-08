@@ -66,7 +66,7 @@ if check_password():
         """, unsafe_allow_html=True
     )
 
-    # --- BAHAGIAN HEADER UTAMA ---
+    # --- BAHAGIAN HEADER UTAMA DENGAN VIDEO ---
     col_logo, col_text = st.columns([1.2, 4])
     with col_logo:
         if os.path.exists("PUO.png"):
@@ -75,16 +75,15 @@ if check_password():
             st.warning("⚠️ Logo 'PUO.png' tidak dijumpai.")
 
     with col_text:
-        st.markdown("""
-            <style>
-                .main-title { font-family: 'Arial Black', Gadget, sans-serif; font-size: 55px; font-weight: 900; margin-bottom: -15px; line-height: 1; letter-spacing: -2px; }
-                .sub-title { font-size: 20px; color: #555; margin-top: 0px; }
-            </style>
-            <div>
-                <h1 class="main-title">SURVEY LOT RUMAH</h1>
-                <p class="sub-title">Politeknik Ungku Omar | Jabatan Kejuruteraan Awam</p>
-            </div>
-        """, unsafe_allow_html=True)
+        # Menambah video sebagai ganti tajuk statik
+        if os.path.exists("VIDEO.mp4"):
+            st.video("VIDEO.mp4", autoplay=True, loop=True, muted=True)
+        else:
+            # Fallback jika video tiada
+            st.markdown("""
+                <h1 style='font-family: sans-serif;'>SURVEY LOT RUMAH</h1>
+                <p>Politeknik Ungku Omar | Jabatan Kejuruteraan Awam</p>
+            """, unsafe_allow_html=True)
     
     st.markdown("<hr style='border: 1px solid #eee; margin-top: 0px;'>", unsafe_allow_html=True)
 
@@ -238,6 +237,7 @@ if check_password():
             else: st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
 
         except Exception as e: st.error(f"❌ Ada ralat: {e}")
+
 
 
 
