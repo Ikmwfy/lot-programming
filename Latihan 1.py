@@ -91,7 +91,7 @@ if check_password():
             <style>
             .header-container {{
                 position: relative; 
-                width: 120%; 
+                width: 110%; 
                 height: 180px; 
                 overflow: hidden;
                 border-radius: 15px; 
@@ -291,6 +291,7 @@ if check_password():
             else: st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
 
         except Exception as e: st.error(f"❌ Ada ralat: {e}")
+
 
 
 
