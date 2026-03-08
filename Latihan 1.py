@@ -1,6 +1,4 @@
 import streamlit as st
-# ... import yang lain ...
-
 st.set_page_config(layout="wide") # TAMBAH BARIS INI
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -374,3 +372,4 @@ if check_password():
             else: st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
 
         except Exception as e: st.error(f"❌ Ada ralat: {e}")
+
