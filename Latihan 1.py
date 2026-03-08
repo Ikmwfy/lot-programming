@@ -166,9 +166,7 @@ if check_password():
                 st.subheader("📐 Paparan Pelan Ukur")
 
                 if show_interactive_map:
-                 # --- MOD PETA INTERAKTIF ---
-                if show_interactive_map:
-                    # Baris di bawah ini MESTI mempunyai indent yang sama (contoh: 20 spaces atau 5 tabs)
+                    # --- MOD PETA INTERAKTIF ---
                     google_map_url = 'https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}'
                     if map_provider == "Standard Map":
                         google_map_url = 'https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}'
@@ -217,23 +215,6 @@ if check_password():
 
                 else:
                     # --- MOD MATPLOTLIB ---
-                    if plot_theme == "Dark Mode": bg_color, grid_color = "#121212", "#555555"
-                    elif plot_theme == "Blueprint": bg_color, grid_color = "#003366", "#004080"
-                    else: bg_color, grid_color = "#ffffff", "#aaaaaa"
-
-                    fig, ax = plt.subplots(figsize=(10, 8))
-                    fig.patch.set_facecolor(bg_color); ax.set_facecolor(bg_color)
-                    ax.plot(*(line_geom.xy), linewidth=2, color=line_color, zorder=4)
-                    ax.fill(*(poly_geom.exterior.xy), color=poly_color, alpha=poly_opacity)
-
-                    if show_bg_grid:
-                        ax.grid(True, color=grid_color, linestyle='--', alpha=0.5)
-                        ax.xaxis.set_major_locator(plt.MultipleLocator(grid_interval))
-                        ax.yaxis.set_major_locator(plt.MultipleLocator(grid_interval))
-                    else: ax.axis('off')
-
-                    if show_luas_label:
-                        ax.text(centroid_m.x, centroid_m.y, f"{area:.2f} m²", fontsize=label_size_luas, fontweight='bold', color='darkgreen', ha='center', bbox=dict(boxstyle='round,pad=0.3', fc='white', alpha=0.9, ec='green'), zorder=10)
 
                     for i in range(len(df)):
                         p1, p2 = df.iloc[i], df.iloc[(i + 1) % len(df)]
@@ -255,6 +236,7 @@ if check_password():
             else: st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
 
         except Exception as e: st.error(f"❌ Ada ralat: {e}")
+
 
 
 
