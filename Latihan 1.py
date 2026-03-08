@@ -154,14 +154,6 @@ if check_password():
                     use_container_width=True
                 )
 
-                # --- METRIK ---
-                st.markdown("### 📊 Ringkasan Lot")
-                col1, col2, col3, col4 = st.columns(4)
-                col1.metric("Luas (m²)", f"{area:.2f}")
-                col2.metric("Luas (Ekar)", f"{area/4046.856:.4f}")
-                col3.metric("Bilangan Stesen", len(df))
-                col4.metric("Status", "Tutup" if poly_geom.is_valid else "Ralat")
-
                 st.markdown("---")
                 st.subheader("📐 Paparan Pelan Ukur")
 
@@ -251,6 +243,7 @@ if check_password():
             else: st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
 
         except Exception as e: st.error(f"❌ Ada ralat: {e}")
+
 
 
 
