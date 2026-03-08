@@ -86,21 +86,6 @@ if check_password():
 
         # Pastikan st.markdown ini selari dengan baris 'if' di atas
         st.markdown(f"""
-        # Pastikan st.markdown diletakkan dengan indentasi yang betul
-        st.markdown(f"""
-<style>
-.header-container {{
-    position: relative; 
-    width: 100%; 
-    height: 180px; 
-    overflow: hidden;
-    border-radius: 15px; 
-    margin-bottom: 25px; 
-    background-color: #000;
-    display: flex;
-    align-items: center;
-}}
-/* ... (kod CSS anda yang lain) ... */
 </style>
 """, unsafe_allow_html=True)
 </style>
@@ -308,6 +293,7 @@ if check_password():
             else: st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
 
         except Exception as e: st.error(f"❌ Ada ralat: {e}")
+
 
 
 
