@@ -61,7 +61,7 @@ if check_password():
         <div style="background: linear-gradient(135deg, #00B4DB, #0083B0); padding: 20px; border-radius: 15px; text-align: center; margin-bottom: 20px;">
             <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" width="80" style="border-radius: 50%; border: 3px solid white;">
             <h3 style="color: white; margin-top: 10px; font-family: sans-serif;">Hai, Malfoy!</h3>
-            <p style="color: #e0e0e0; font-size: 0.8em; margin-bottom: 0px;">sStudent</p>
+            <p style="color: #e0e0e0; font-size: 0.8em; margin-bottom: 0px;">Student</p>
         </div>
         """, unsafe_allow_html=True
     )
@@ -235,6 +235,7 @@ if check_password():
             else: st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
 
         except Exception as e: st.error(f"❌ Ada ralat: {e}")
+
 
 
 
