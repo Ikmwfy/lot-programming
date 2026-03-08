@@ -84,17 +84,31 @@ if check_password():
             with open(logo_path, "rb") as image_file:
                 logo_base64 = base64.b64encode(image_file.read()).decode()
 
-        st.markdown(f"""
+       st.markdown(f"""
             <style>
             .header-container {{
-                position: relative; width: 150%; height: 180px; overflow: hidden;
-                border-radius: 15px; margin-bottom: 25px; display: flex;
-                align-items: center; background-color: #000;
+                position: relative; 
+                width: 100%; 
+                height: 180px; 
+                overflow: hidden;
+                border-radius: 15px; 
+                margin-bottom: 25px; 
+                margin-left: -40px; /* Nilai negatif ini akan menarik header ke kiri */
+                background-color: #000;
+                display: flex;
+                align-items: center;
             }}
             .video-bg {{
-                position: absolute; top: 50%; left: 50%; min-width: 100%;
-                min-height: 100%; width: auto; height: auto; z-index: 0;
-                transform: translate(-50%, -50%); opacity: 0.6;
+                position: absolute; 
+                top: 50%; 
+                left: 0; 
+                min-width: 100%;
+                min-height: 100%; 
+                width: auto; 
+                height: auto; 
+                z-index: 0;
+                transform: translateY(-50%); 
+                opacity: 0.6;
             }}
             .header-content {{
                 position: relative; z-index: 1; display: flex; align-items: center;
@@ -274,6 +288,7 @@ if check_password():
             else: st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
 
         except Exception as e: st.error(f"❌ Ada ralat: {e}")
+
 
 
 
