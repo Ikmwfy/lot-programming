@@ -69,57 +69,82 @@ if check_password():
     logo_path = "PUO.png"
 
     # --- 👤 PROFIL PENGGUNA (SIDEBAR) ---
-    bg_video_base64 = get_video_base64("BACKGROUND.mp4")
-    
-    with open("ICON.jpeg", "rb") as f:
-        icon_base64 = base64.b64encode(f.read()).decode()
+    try:
+        bg_video_base64 = get_video_base64("BACKGROUND.mp4")
+        
+        with open("ICON.jpeg", "rb") as f:
+            icon_base64 = base64.b64encode(f.read()).decode()
 
-    st.sidebar.markdown(f"""
-        <div class="sidebar-profile-container">
-            <video autoplay loop muted playsinline class="sidebar-video-bg">
-                <source src="data:video/mp4;base64,{bg_video_base64}" type="video/mp4">
-            </video>
-            <div class="sidebar-profile-content">
-                <img src="data:image/png;base64,{icon_base64}" class="sidebar-icon">
-                <h3 style="color: white; margin-top: 10px; font-family: sans-serif;">Hai, Malfoy!</h3>
-                <p style="color: #e0e0e0; font-size: 0.8em;">Student</p>
+        st.sidebar.markdown(f"""
+            <div class="sidebar-profile-container">
+                <video autoplay loop muted playsinline class="sidebar-video-bg">
+                    <source src="data:video/mp4;base64,{bg_video_base64}" type="video/mp4">
+                </video>
+                <div class="sidebar-profile-content">
+                    <div class="icon-wrapper">
+                        <img src="data:image/png;base64,{icon_base64}" class="sidebar-icon">
+                    </div>
+                    <h3 style="color: white; margin-top: 10px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-weight: 700; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">Hai, Malfoy!</h3>
+                    <p style="color: #00d4ff; font-size: 0.9em; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;">Student</p>
+                </div>
             </div>
-        </div>
-        <style>
-        .sidebar-profile-container {{
-            position: relative;
-            width: 100%;
-            height: 200px;
-            border-radius: 15px;
-            overflow: hidden;
-            text-align: center;
-            margin-bottom: 20px;
-        }}
-        .sidebar-video-bg {{
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            z-index: 0;
-        }}
-        .sidebar-profile-content {{
-            position: relative;
-            z-index: 1;
-            padding-top: 40px;
-            background: rgba(0, 0, 0, 0.4); /* Gelapkan sedikit untuk nampak teks */
-            height: 100%;
-        }}
-        .sidebar-icon {{
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            border: 3px solid white;
-            object-fit: cover;
-        }}
-        </style>
-    """, unsafe_allow_html=True)
+            
+            <style>
+            /* Container Utama */
+            .sidebar-profile-container {{
+                position: relative;
+                width: 100%;
+                height: 230px;
+                border-radius: 20px;
+                overflow: hidden;
+                text-align: center;
+                margin-bottom: 25px;
+                box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+                border: 1px solid rgba(255,255,255,0.1);
+            }}
+
+            /* Video Latar */
+            .sidebar-video-bg {{
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                z-index: 0;
+            }}
+
+            /* Overlay Gelap & Content */
+            .sidebar-profile-content {{
+                position: relative;
+                z-index: 1;
+                padding-top: 30px;
+                background: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.7));
+                height: 100%;
+            }}
+
+            /* Frame Ikon Bulat */
+            .icon-wrapper {{
+                display: inline-block;
+                padding: 5px;
+                background: rgba(255, 255, 255, 0.2);
+                border-radius: 50%;
+                backdrop-filter: blur(5px);
+            }}
+
+            .sidebar-icon {{
+                width: 90px;
+                height: 90px;
+                border-radius: 50%; /* Membuatkan ia bulat */
+                border: 3px solid white;
+                object-fit: cover; /* Penting: supaya gambar tak herot/stretch */
+                display: block;
+                box-shadow: 0 0 15px rgba(255,255,255,0.5); /* Kesan glowing */
+            }}
+            </style>
+        """, unsafe_allow_html=True)
+    except Exception as e:
+        st.sidebar.error(f"⚠️ Masalah profil: Pastikan fail BACKGROUND.mp4 & ICON.png ada di GitHub.")
 
     # --- HEADER VISUAL BERGERAK (VIDEO) ---
     if os.path.exists(video_path):
@@ -335,6 +360,7 @@ if check_password():
             else: st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
 
         except Exception as e: st.error(f"❌ Ada ralat: {e}")
+
 
 
 
