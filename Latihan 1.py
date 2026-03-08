@@ -123,24 +123,27 @@ if check_password():
                 height: 100%;
             }}
 
-            /* Frame Ikon Bulat */
-            .icon-wrapper {{
+           /* Frame Ikon Bulat yang memotong imej */
+            .icon-wrapper {
                 display: inline-block;
-                padding: 5px;
+                width: 100px; /* Saiz bingkai luar */
+                height: 100px;
                 background: rgba(255, 255, 255, 0.2);
-                border-radius: 50%;
-                backdrop-filter: blur(5px);
-            }}
-
-            .sidebar-icon {{
-                width: 90px;
-                height: 90px;
-                border-radius: 50%; /* Membuatkan ia bulat */
+                border-radius: 50%; /* Wajib bulat */
+                overflow: hidden; /* Ini akan potong bahagian petak yang terkeluar */
                 border: 3px solid white;
-                object-fit: cover; /* Penting: supaya gambar tak herot/stretch */
+                box-shadow: 0 0 15px rgba(255,255,255,0.5);
+                backdrop-filter: blur(5px);
+                position: relative;
+            }
+
+            .sidebar-icon {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                transform: scale(1.2); /* ZOOM di sini: 1.2 bermaksud zoom 20% ke dalam */
                 display: block;
-                box-shadow: 0 0 15px rgba(255,255,255,0.5); /* Kesan glowing */
-            }}
+            }
             </style>
         """, unsafe_allow_html=True)
     except Exception as e:
@@ -360,6 +363,7 @@ if check_password():
             else: st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
 
         except Exception as e: st.error(f"❌ Ada ralat: {e}")
+
 
 
 
