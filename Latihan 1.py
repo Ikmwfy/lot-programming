@@ -25,7 +25,7 @@ def reset_password_dialog():
     pass_sah = st.text_input("Sahkan Kata Laluan Baharu:", type="password")
     
     if st.button("Simpan Kata Laluan", use_container_width=True):
-        if id_sah == "zed" and pass_baru == pass_sah and pass_baru != "":
+        if id_sah == "ikmalkacak" and pass_baru == pass_sah and pass_baru != "":
             st.success("✅ Kata laluan berjaya dikemaskini!")
             st.rerun()
         else:
@@ -35,7 +35,7 @@ def check_password():
     if "password_correct" not in st.session_state:
         _, col_mid, _ = st.columns([1, 1.5, 1])
         with col_mid:
-            st.markdown("<h2 style='text-align: center;'>🔐 Sistem Survey Lot PUO</h2>", unsafe_allow_html=True)
+            st.markdown("<h2 style='text-align: center;'>🔐 Survey Lot Rumah</h2>", unsafe_allow_html=True)
             user_id = st.text_input("👤 Masukkan ID:", key="user_id")
             password = st.text_input("🔑 Masukkan Kata Laluan:", type="password", key="user_pass")
             st.markdown("<br>", unsafe_allow_html=True)
@@ -69,10 +69,10 @@ if check_password():
     # --- BAHAGIAN HEADER UTAMA ---
     col_logo, col_text = st.columns([1.2, 4])
     with col_logo:
-        if os.path.exists("Poli_Logo.png"):
-            st.image("Poli_Logo.png", width=180)
+        if os.path.exists("PUO.png"):
+            st.image("PUO.png", width=180)
         else:
-            st.warning("⚠️ Logo 'Poli_Logo.png' tidak dijumpai.")
+            st.warning("⚠️ Logo 'PUO.png' tidak dijumpai.")
 
     with col_text:
         st.markdown("""
@@ -81,7 +81,7 @@ if check_password():
                 .sub-title { font-size: 20px; color: #555; margin-top: 0px; }
             </style>
             <div>
-                <h1 class="main-title">SISTEM SURVEY LOT</h1>
+                <h1 class="main-title">SURVEY LOT RUMAH</h1>
                 <p class="sub-title">Politeknik Ungku Omar | Jabatan Kejuruteraan Awam</p>
             </div>
         """, unsafe_allow_html=True)
@@ -235,4 +235,5 @@ if check_password():
             else: st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
 
         except Exception as e: st.error(f"❌ Ada ralat: {e}")
+
 
