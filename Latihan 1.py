@@ -72,7 +72,7 @@ if check_password():
     try:
         bg_video_base64 = get_video_base64("BACKGROUND.mp4")
         
-        with open("ICON.jpeg", "rb") as f:
+        with open("ICON.png", "rb") as f:
             icon_base64 = base64.b64encode(f.read()).decode()
 
         st.sidebar.markdown(f"""
@@ -90,7 +90,6 @@ if check_password():
             </div>
             
             <style>
-            /* Container Utama */
             .sidebar-profile-container {{
                 position: relative;
                 width: 100%;
@@ -103,7 +102,6 @@ if check_password():
                 border: 1px solid rgba(255,255,255,0.1);
             }}
 
-            /* Video Latar */
             .sidebar-video-bg {{
                 position: absolute;
                 top: 0;
@@ -114,7 +112,6 @@ if check_password():
                 z-index: 0;
             }}
 
-            /* Overlay Gelap & Content */
             .sidebar-profile-content {{
                 position: relative;
                 z-index: 1;
@@ -123,27 +120,26 @@ if check_password():
                 height: 100%;
             }}
 
-           /* Frame Ikon Bulat yang memotong imej */
-            .icon-wrapper {
+            /* --- KEMASKINI DI SINI --- */
+            .icon-wrapper {{
                 display: inline-block;
-                width: 100px; /* Saiz bingkai luar */
+                width: 100px; /* Tetapkan saiz wrapper */
                 height: 100px;
                 background: rgba(255, 255, 255, 0.2);
-                border-radius: 50%; /* Wajib bulat */
-                overflow: hidden; /* Ini akan potong bahagian petak yang terkeluar */
+                border-radius: 50%; /* Acuan bulat sempurna */
+                overflow: hidden; /* POTONG border petak yang terkeluar */
                 border: 3px solid white;
                 box-shadow: 0 0 15px rgba(255,255,255,0.5);
                 backdrop-filter: blur(5px);
-                position: relative;
-            }
+            }}
 
-            .sidebar-icon {
+            .sidebar-icon {{
                 width: 100%;
                 height: 100%;
                 object-fit: cover;
-                transform: scale(1.2); /* ZOOM di sini: 1.2 bermaksud zoom 20% ke dalam */
+                transform: scale(1.3); /* ZOOM 30% untuk hilangkan border petak */
                 display: block;
-            }
+            }}
             </style>
         """, unsafe_allow_html=True)
     except Exception as e:
@@ -363,6 +359,7 @@ if check_password():
             else: st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
 
         except Exception as e: st.error(f"❌ Ada ralat: {e}")
+
 
 
 
