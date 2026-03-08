@@ -123,7 +123,7 @@ if check_password():
             </style>
             <div class="header-container">
                 <video class="header-video" autoplay loop muted playsinline>
-                    <source src="VIDEO.mp4" type="video/mp4">
+                    <source src="VIDEO.mp4" type="VIDEO/mp4">
                 </video>
                 <div class="header-content">
                     <h1 class="main-title">SISTEM SURVEY LOT RUMAH</h1>
@@ -284,6 +284,7 @@ if check_password():
             else: st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
 
         except Exception as e: st.error(f"❌ Ada ralat: {e}")
+
 
 
 
