@@ -88,7 +88,7 @@ if check_password():
         <style>
         .sidebar-profile-container {{
             position: relative;
-            width: 100%;
+            width: 120%;
             height: 200px;
             border-radius: 15px;
             overflow: hidden;
@@ -335,6 +335,7 @@ if check_password():
             else: st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
 
         except Exception as e: st.error(f"❌ Ada ralat: {e}")
+
 
 
 
