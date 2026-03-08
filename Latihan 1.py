@@ -8,6 +8,12 @@ import os
 import folium 
 from streamlit_folium import folium_static 
 from pyproj import Transformer
+import base64
+
+def get_video_base64(video_file):
+    with open(video_file, "rb") as f:
+        data = f.read()
+    return base64.b64encode(data).decode()
 
 # ================== FUNGSI TUKAR DMS ==================
 def format_dms(decimal_degree):
@@ -55,82 +61,66 @@ def check_password():
 # ================== MAIN APP (SELEPAS LOGIN) ==================
 if check_password():
     
-    # --- 👤 PROFIL PENGGUNA (SIDEBAR PALING ATAS) ---
-    st.sidebar.markdown(
-        """
+    # Tetapan laluan fail
+    video_path = "VIDEO.mp4" 
+    logo_path = "PUO.png"
+
+    # --- 👤 PROFIL PENGGUNA (SIDEBAR) ---
+    st.sidebar.markdown("""
         <div style="background: linear-gradient(135deg, #00B4DB, #0083B0); padding: 20px; border-radius: 15px; text-align: center; margin-bottom: 20px;">
             <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" width="80" style="border-radius: 50%; border: 3px solid white;">
             <h3 style="color: white; margin-top: 10px; font-family: sans-serif;">Hai, Malfoy!</h3>
             <p style="color: #e0e0e0; font-size: 0.8em; margin-bottom: 0px;">Student</p>
         </div>
-        """, unsafe_allow_html=True
-    )
+    """, unsafe_allow_html=True)
 
-    # --- BAHAGIAN HEADER UTAMA ---
-    col_logo, col_text = st.columns([1.2, 4])
-    
-    with col_logo:
-        if os.path.exists("PUO.png"):
-            st.image("PUO.png", width=180)
-        else:
-            st.warning("⚠️ Logo 'PUO.png' tidak dijumpai.")
+    # --- HEADER VISUAL BERGERAK (VIDEO) ---
+    if os.path.exists(video_path):
+        video_base64 = get_video_base64(video_path)
+        
+        # Ambil logo untuk base64 jika wujud
+        logo_base64 = ""
+        if os.path.exists(logo_path):
+            with open(logo_path, "rb") as image_file:
+                logo_base64 = base64.b64encode(image_file.read()).decode()
 
-    with col_text:
-        # Kod ini dilaraskan untuk memberikan saiz dan rupa yang sama dengan imej anda
-        st.markdown("""
+        st.markdown(f"""
             <style>
-                .header-container {
-                    position: relative;
-                    width: 100%;
-                    height: 150px; /* Saiz ketinggian supaya nampak padat seperti imej */
-                    overflow: hidden;
-                    border-radius: 10px;
-                    display: flex;
-                    align-items: center;
-                    justify-content: flex-start; /* Jajaran teks ke kiri */
-                    padding-left: 30px;
-                }
-                .header-video {
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    object-fit: cover;
-                    z-index: 1;
-                }
-                .header-content {
-                    position: relative;
-                    z-index: 2;
-                    background: rgba(100, 70, 50, 0.8); /* Warna coklat pekat */
-                    padding: 20px;
-                    width: 100%;
-                    color: white;
-                    border-radius: 10px;
-                }
-                .main-title { 
-                    font-family: 'Arial Black', Gadget, sans-serif; 
-                    font-size: 35px; /* Saiz tajuk utama */
-                    font-weight: 900; 
-                    margin: 0; 
-                    line-height: 1.2; 
-                }
-                .sub-title { 
-                    font-size: 16px; /* Saiz sub-tajuk */
-                    margin: 0; 
-                    font-weight: normal;
-                }
+            .header-container {{
+                position: relative; width: 100%; height: 180px; overflow: hidden;
+                border-radius: 15px; margin-bottom: 25px; display: flex;
+                align-items: center; background-color: #000;
+            }}
+            .video-bg {{
+                position: absolute; top: 50%; left: 50%; min-width: 100%;
+                min-height: 100%; width: auto; height: auto; z-index: 0;
+                transform: translate(-50%, -50%); opacity: 0.6;
+            }}
+            .header-content {{
+                position: relative; z-index: 1; display: flex; align-items: center;
+                padding: 20px; width: 100%;
+            }}
+            .header-logo {{ width: 100px; margin-right: 25px; filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.5)); }}
+            .header-text-container {{ color: white; }}
+            .header-title-main {{ font-size: 38px; font-weight: 800; text-shadow: 2px 2px 8px rgba(0,0,0,0.8); margin: 0; }}
+            .header-subtitle-main {{ font-size: 16px; opacity: 0.9; margin: 0; }}
             </style>
+            
             <div class="header-container">
-                <video class="header-video" autoplay loop muted playsinline>
-                    <source src="VIDEO.mp4" type="VIDEO/mp4">
+                <video autoplay loop muted playsinline class="video-bg">
+                    <source src="data:video/mp4;base64,{video_base64}" type="video/mp4">
                 </video>
                 <div class="header-content">
-                    <h1 class="main-title">SISTEM SURVEY LOT RUMAH</h1>
-                    <p class="sub-title">Politeknik Ungku Omar | Jabatan Kejuruteraan Awam</p>
+                    <img src="data:image/png;base64,{logo_base64}" class="header-logo">
+                    <div class="header-text-container">
+                        <h1 class="header-title-main">SISTEM SURVEY LOT RUMAH</h1>
+                        <p class="header-subtitle-main">Politeknik Ungku Omar | Jabatan Kejuruteraan Awam</p>
+                    </div>
                 </div>
             </div>
         """, unsafe_allow_html=True)
+    else:
+        st.error("⚠️ Fail 'VIDEO.mp4' tidak dijumpai untuk paparan header.")
     
     st.markdown("<hr style='border: 1px solid #eee; margin-top: 0px;'>", unsafe_allow_html=True)
 
@@ -284,6 +274,7 @@ if check_password():
             else: st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
 
         except Exception as e: st.error(f"❌ Ada ralat: {e}")
+
 
 
 
