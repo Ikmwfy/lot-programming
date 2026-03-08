@@ -87,7 +87,7 @@ if check_password():
         st.markdown(f"""
             <style>
             .header-container {{
-                position: relative; width: 100%; height: 180px; overflow: hidden;
+                position: relative; width: 150%; height: 180px; overflow: hidden;
                 border-radius: 15px; margin-bottom: 25px; display: flex;
                 align-items: center; background-color: #000;
             }}
@@ -274,6 +274,7 @@ if check_password():
             else: st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
 
         except Exception as e: st.error(f"❌ Ada ralat: {e}")
+
 
 
 
