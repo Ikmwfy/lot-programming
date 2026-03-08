@@ -235,13 +235,10 @@ if check_password():
                         ax.text(p1['E'], p1['N'], str(int(p1['STN'])), fontsize=label_size_stn/2, color='black', fontweight='bold', ha='center', va='center', zorder=6)
                     ax.set_aspect("equal"); st.pyplot(fig)
 
-                st.markdown("---")
-                st.subheader("📋 Jadual Data Koordinat")
-                st.dataframe(df[['STN', 'E', 'N', 'lat', 'lon']], use_container_width=True)
-
             else: st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
 
         except Exception as e: st.error(f"❌ Ada ralat: {e}")
+
 
 
 
