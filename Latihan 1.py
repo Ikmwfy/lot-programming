@@ -78,13 +78,13 @@ if check_password():
     if os.path.exists(video_path):
         video_base64 = get_video_base64(video_path)
         
-        # Ambil logo untuk base64 jika wujud
         logo_base64 = ""
         if os.path.exists(logo_path):
             with open(logo_path, "rb") as image_file:
                 logo_base64 = base64.b64encode(image_file.read()).decode()
 
-       st.markdown(f"""
+        # Pastikan st.markdown ini selari dengan baris 'if' di atas
+        st.markdown(f"""
             <style>
             .header-container {{
                 position: relative; 
@@ -93,7 +93,7 @@ if check_password():
                 overflow: hidden;
                 border-radius: 15px; 
                 margin-bottom: 25px; 
-                margin-left: -40px; /* Nilai negatif ini akan menarik header ke kiri */
+                margin-left: -40px; 
                 background-color: #000;
                 display: flex;
                 align-items: center;
@@ -288,6 +288,7 @@ if check_password():
             else: st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
 
         except Exception as e: st.error(f"❌ Ada ralat: {e}")
+
 
 
 
