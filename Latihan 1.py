@@ -76,18 +76,19 @@ if check_password():
             st.warning("⚠️ Logo 'PUO.png' tidak dijumpai.")
 
     with col_text:
-        # Menggunakan container untuk menjadikan video sebagai latar belakang teks
+        # Kod ini dilaraskan untuk memberikan saiz dan rupa yang sama dengan imej anda
         st.markdown("""
             <style>
                 .header-container {
                     position: relative;
                     width: 100%;
-                    height: 200px;
+                    height: 150px; /* Saiz ketinggian supaya nampak padat seperti imej */
                     overflow: hidden;
                     border-radius: 10px;
                     display: flex;
                     align-items: center;
-                    justify-content: center;
+                    justify-content: flex-start; /* Jajaran teks ke kiri */
+                    padding-left: 30px;
                 }
                 .header-video {
                     position: absolute;
@@ -101,13 +102,24 @@ if check_password():
                 .header-content {
                     position: relative;
                     z-index: 2;
-                    background: rgba(100, 70, 50, 0.7);
+                    background: rgba(100, 70, 50, 0.8); /* Warna coklat pekat */
                     padding: 20px;
                     width: 100%;
                     color: white;
+                    border-radius: 10px;
                 }
-                .main-title { font-family: 'Arial Black', Gadget, sans-serif; font-size: 40px; font-weight: 900; margin: 0; line-height: 1; }
-                .sub-title { font-size: 18px; margin: 0; }
+                .main-title { 
+                    font-family: 'Arial Black', Gadget, sans-serif; 
+                    font-size: 35px; /* Saiz tajuk utama */
+                    font-weight: 900; 
+                    margin: 0; 
+                    line-height: 1.2; 
+                }
+                .sub-title { 
+                    font-size: 16px; /* Saiz sub-tajuk */
+                    margin: 0; 
+                    font-weight: normal;
+                }
             </style>
             <div class="header-container">
                 <video class="header-video" autoplay loop muted playsinline>
@@ -272,5 +284,6 @@ if check_password():
             else: st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
 
         except Exception as e: st.error(f"❌ Ada ralat: {e}")
+
 
 
