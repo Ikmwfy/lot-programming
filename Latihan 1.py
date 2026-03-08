@@ -85,30 +85,31 @@ if check_password():
                 logo_base64 = base64.b64encode(image_file.read()).decode()
 
         st.markdown(f"""
-            <style>
-.header-container {
-    position: relative; 
-    width: 100%; /* Ubah kepada 100% supaya ia tidak melimpah keluar */
-    height: 180px; 
-    overflow: hidden;
-    border-radius: 15px; 
-    margin-bottom: 25px; 
-    margin-left: -20px; /* Tambah ini untuk tarik ke kiri */
-    background-color: #000;
-}
-.video-bg {
-    position: absolute; 
-    top: 50%; 
-    left: 0; /* Pastikan ia bermula dari kiri */
-    min-width: 100%;
-    min-height: 100%; 
-    width: auto; 
-    height: auto; 
-    z-index: 0;
-    transform: translateY(-50%); /* Buang translate-x supaya ia tidak lari ke tengah */
-    opacity: 0.6; 
-}
-/* ... (kod lain kekalkan seperti asal) ... */
+            # Pastikan kod CSS anda sentiasa dimulakan dengan st.markdown(f""" <style> ...
+    st.markdown(f"""
+        <style>
+        .header-container {{
+            position: relative; 
+            width: 100%; 
+            height: 180px; 
+            overflow: hidden;
+            border-radius: 15px; 
+            margin-bottom: 25px; 
+            margin-left: -40px; /* Laraskan nilai negatif ini untuk gerak ke kiri */
+            background-color: #000;
+        }}
+        .video-bg {{
+            position: absolute; 
+            top: 50%; 
+            left: 0; 
+            min-width: 100%;
+            min-height: 100%; 
+            width: auto; 
+            height: auto; 
+            z-index: 0;
+            transform: translateY(-50%); 
+            opacity: 0.6; 
+        }}
 </style>
             }}
             .header-content {{
@@ -289,6 +290,7 @@ if check_password():
             else: st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
 
         except Exception as e: st.error(f"❌ Ada ralat: {e}")
+
 
 
 
