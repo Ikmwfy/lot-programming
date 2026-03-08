@@ -1,7 +1,4 @@
 import streamlit as st
-# ... import yang lain ...
-
-st.set_page_config(layout="wide") # TAMBAH BARIS INI
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -9,7 +6,7 @@ from shapely.geometry import Polygon, Point, LineString, mapping
 import json
 import os
 import folium
-from streamlit_folium import st_folium 
+from streamlit_folium import st_folium
 from pyproj import Transformer
 import base64
 
@@ -374,6 +371,7 @@ if check_password():
             else: st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
 
         except Exception as e: st.error(f"❌ Ada ralat: {e}")
+
 
 
 
