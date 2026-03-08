@@ -93,7 +93,7 @@ if check_password():
                 overflow: hidden;
                 border-radius: 15px; 
                 margin-bottom: 25px; 
-                margin-left: -40px; 
+                margin-left: 0px; 
                 background-color: #000;
                 display: flex;
                 align-items: center;
@@ -288,6 +288,7 @@ if check_password():
             else: st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
 
         except Exception as e: st.error(f"❌ Ada ralat: {e}")
+
 
 
 
