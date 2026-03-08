@@ -86,6 +86,20 @@ if check_password():
 
         # Pastikan st.markdown ini selari dengan baris 'if' di atas
         st.markdown(f"""
+    <style>
+    /* 1. Paksa kontena utama Streamlit untuk menggunakan 95% lebar skrin */
+    [data-testid="stAppViewContainer"] > .main {
+        max-width: 95% !important;
+        padding-left: 2%;
+        padding-right: 2%;
+    }
+    
+    /* 2. Paksa iframe peta untuk mengambil 100% lebar kontena yang sudah dibesarkan */
+    iframe {
+        width: 100% !important;
+    }
+    </style>
+""", unsafe_allow_html=True)
             <style>
             .header-container {{
                 position: relative; 
@@ -289,6 +303,7 @@ if check_password():
             else: st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
 
         except Exception as e: st.error(f"❌ Ada ralat: {e}")
+
 
 
 
