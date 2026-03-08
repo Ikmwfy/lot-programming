@@ -7,8 +7,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from shapely.geometry import Polygon, Point, LineString, mapping
 import json
-import os
-import folium 
+import os import folium 
 from streamlit_folium import folium_static 
 from pyproj import Transformer
 import base64
@@ -374,3 +373,4 @@ if check_password():
             else: st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
 
         except Exception as e: st.error(f"❌ Ada ralat: {e}")
+
