@@ -155,7 +155,6 @@ if check_password():
                 )
 
                 st.markdown("---")
-                st.subheader("📐 Paparan Pelan Ukur")
 
                 if show_interactive_map:
                     # --- MOD PETA INTERAKTIF ---
@@ -243,6 +242,7 @@ if check_password():
             else: st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
 
         except Exception as e: st.error(f"❌ Ada ralat: {e}")
+
 
 
 
