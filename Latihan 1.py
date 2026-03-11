@@ -46,18 +46,24 @@ def check_password():
             video_base64 = get_video_base64("PASSWORD.mp4")
             st.markdown(f"""
                 <style>
-                /* Menetapkan video sebagai background */
-                .stApp {{
-                    background: none;
-                }}
+                .stApp {{ background: none; }}
                 .bg-video {{
-                    position: fixed;
-                    right: 0;
-                    bottom: 0;
-                    min-width: 100%;
-                    min-height: 100%;
-                    z-index: -1;
-                    object-fit: cover;
+                    position: fixed; right: 0; bottom: 0; min-width: 100%; min-height: 100%;
+                    z-index: -1; object-fit: cover;
+                }}
+                /* --- STYLE KOTAK INPUT --- */
+                /* Menukar warna background kotak input */
+                [data-testid="stTextInput"] input {{
+                    background-color: #f0f2f6 !important;
+                    color: #333 !important;
+                    font-size: 16px !important;
+                    border-radius: 8px !important;
+                    padding: 10px !important;
+                }}
+                /* Menukar warna label input */
+                [data-testid="stTextInput"] label {{
+                    color: #444 !important;
+                    font-weight: bold !important;
                 }}
                 </style>
                 <video autoplay loop muted playsinline class="bg-video">
@@ -69,16 +75,17 @@ def check_password():
         with col_mid:
             # --- KOTAK LOGIN SOLID ---
             st.markdown("""
-                <div style="background-color: #ffffff; padding: 30px; border-radius: 15px; 
+                <div style="background-color: #ffffff; padding: 40px; border-radius: 15px; 
                             box-shadow: 0 8px 20px rgba(0,0,0,0.3); margin-top: 50px;">
-                    <h2 style='text-align: center; color: #333;'>Survey Lot Rumah</h2>
+                    <h2 style='text-align: center; color: #333; margin-bottom: 20px;'>Survey Lot Rumah</h2>
             """, unsafe_allow_html=True)
             
             with st.form("login_form"):
+                # Input kini akan mengikut style CSS di atas
                 user_id = st.text_input("👤 Masukkan ID:", key="user_id")
                 password = st.text_input("🔑 Masukkan Kata Laluan:", type="password", key="user_pass")
-                st.markdown("<br>", unsafe_allow_html=True)
                 
+                # Mengubah style butang supaya lebih cantik
                 submit_button = st.form_submit_button("Log Masuk", use_container_width=True)
                 
                 if submit_button:
@@ -91,7 +98,7 @@ def check_password():
             if st.button("❓ Lupa Kata Laluan?", use_container_width=True):
                 reset_password_dialog()
                 
-            st.markdown("</div>", unsafe_allow_html=True) # Tutup div kotak login
+            st.markdown("</div>", unsafe_allow_html=True) 
             
         return False
     return True
@@ -400,6 +407,7 @@ if check_password():
             else: st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
 
         except Exception as e: st.error(f"❌ Ada ralat: {e}")
+
 
 
 
