@@ -295,8 +295,8 @@ label_size_data = st.sidebar.slider("Saiz Bearing/Jarak", 5, 12, 7)
 label_size_luas = st.sidebar.slider("Saiz Tulisan LUAS", 8, 30, 14) 
 dist_offset = st.sidebar.slider("Jarak Label Stesen ke Luar", 0.5, 5.0, 1.5)
 
-    # ================== BACA DATA & AUTO-DISPLAY ==================
-    if uploaded_file is not None:
+ # ================== BACA DATA & AUTO-DISPLAY ==================
+if uploaded_file is not None:
         try:
             # Menggunakan pandas untuk baca data
             df = pd.read_csv(uploaded_file)
@@ -433,6 +433,7 @@ dist_offset = st.sidebar.slider("Jarak Label Stesen ke Luar", 0.5, 5.0, 1.5)
     else:
         # Paparan jika belum upload fail
         st.info("👋 Selamat datang! Sila muat naik fail CSV di sidebar untuk melihat peta lot secara automatik.")
+
 
 
 
