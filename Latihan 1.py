@@ -239,19 +239,31 @@ if check_password():
     st.markdown("<hr style='border: 1px solid #eee; margin-top: 0px;'>", unsafe_allow_html=True)
 
     # ================== SIDEBAR SETTINGS ==================
-    st.sidebar.header("⚙️ Tetapan Paparan")
-    uploaded_file = st.sidebar.file_uploader("Upload fail CSV", type=["csv"])
+st.sidebar.header("⚙️ Tetapan Paparan")
+uploaded_file = st.sidebar.file_uploader("Upload fail CSV", type=["csv"])
 
-    st.sidebar.markdown("---")
-    st.sidebar.subheader("🌍 Mod Peta Interaktif")
-    
-    if "show_map" not in st.session_state:
-        st.session_state.show_map = False
-        
-    show_interactive_map = st.sidebar.toggle("On/Off Peta Satelit", value=st.session_state.show_map)
-    st.session_state.show_map = show_interactive_map
-    
-    map_provider = st.sidebar.radio("Pilih Jenis Peta:", ["Satelit (Hybrid)", "Standard Map"], disabled=not show_interactive_map)
+# --- LOGIK AUTO-ON PETA ---
+if "show_map" not in st.session_state:
+    st.session_state.show_map = False
+
+# Jika fail baru dimuat naik, paksa toggle jadi True
+if uploaded_file is not None and "file_uploaded_before" not in st.session_state:
+    st.session_state.show_map = True
+    st.session_state.file_uploaded_before = True 
+elif uploaded_file is None:
+    if "file_uploaded_before" in st.session_state:
+        del st.session_state.file_uploaded_before
+
+st.sidebar.markdown("---")
+st.sidebar.subheader("🌍 Mod Peta Interaktif")
+
+# Widget toggle sekarang akan sentiasa mengikut nilai terkini session_state
+show_interactive_map = st.sidebar.toggle("On/Off Peta Satelit", value=st.session_state.show_map, key="map_toggle")
+
+# Update semula session state supaya konsisten
+st.session_state.show_map = show_interactive_map
+
+map_provider = st.sidebar.radio("Pilih Jenis Peta:", ["Satelit (Hybrid)", "Standard Map"], disabled=not show_interactive_map)
 
     # --- PILIHAN WARNA ---
     st.sidebar.markdown("---")
@@ -411,6 +423,7 @@ if check_password():
     else:
         # Paparan jika belum upload fail
         st.info("👋 Selamat datang! Sila muat naik fail CSV di sidebar untuk melihat peta lot secara automatik.")
+
 
 
 
