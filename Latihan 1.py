@@ -243,11 +243,11 @@ if check_password():
     st.markdown("<hr style='border: 1px solid #eee; margin-top: 0px;'>", unsafe_allow_html=True)
 
     # ================== SIDEBAR SETTINGS ==================
-    st.sidebar.header("⚙️ Tetapan Paparan")
+    st.sidebar.header("⚙️ Paparan Fail")
     uploaded_file = st.sidebar.file_uploader("Upload fail CSV", type=["csv"])
 
     st.sidebar.markdown("---")
-    st.sidebar.subheader("🌍 Mod Peta Interaktif")
+    st.sidebar.subheader("🌍 Suiz Peta ")
     
     if "show_map" not in st.session_state:
         st.session_state.show_map = False
@@ -259,7 +259,7 @@ if check_password():
 
     # --- PILIHAN WARNA ---
     st.sidebar.markdown("---")
-    st.sidebar.subheader("🎨 Pilihan Warna")
+    st.sidebar.subheader("🎨 Jenis Warna")
     poly_color = st.sidebar.color_picker("Warna Kawasan (Poligon)", "#6036AF") 
     line_color = st.sidebar.color_picker("Warna Garisan Sempadan", "#FFFF00") 
     poly_opacity = st.sidebar.slider("Kelegapan Kawasan", 0.0, 1.0, 0.3)
@@ -270,7 +270,7 @@ if check_password():
     grid_interval = st.sidebar.slider("Jarak Selang Grid", 5, 50, 10)
 
     st.sidebar.markdown("---")
-    st.sidebar.subheader("🖋️ Gaya Label")
+    st.sidebar.subheader("🖋️ Label Kretiviti")
     show_luas_label = st.sidebar.checkbox("Papar Label LUAS", value=True)
     label_size_stn = st.sidebar.slider("Saiz Bulatan Stesen", 15, 30, 22) 
     label_size_data = st.sidebar.slider("Saiz Bearing/Jarak", 5, 12, 7)
@@ -411,6 +411,7 @@ if check_password():
             else: st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
 
         except Exception as e: st.error(f"❌ Ada ralat: {e}")
+
 
 
 
