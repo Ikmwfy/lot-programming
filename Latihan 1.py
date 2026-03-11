@@ -290,7 +290,11 @@ if check_password():
             st.rerun() # Ini kunci supaya peta terus keluar tanpa perlu klik manual
         
         try:
-            df = pd.read_csv(uploaded_file)
+            df = @st.cache_data
+                 def process_survey_data(uploaded_file):
+                     return pd.read_csv(uploaded_file)
+
+# Gantikan pd.read_csv(uploaded_file) dengan fungsi di atas
             # ... (selebihnya kod anda kekal sama) ...
             
             if all(col in df.columns for col in ['STN', 'E', 'N']):
@@ -419,6 +423,7 @@ if check_password():
             else: st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
 
         except Exception as e: st.error(f"❌ Ada ralat: {e}")
+
 
 
 
