@@ -265,18 +265,20 @@ if check_password():
     label_size_luas = st.sidebar.slider("Saiz Tulisan LUAS", 8, 30, 14) 
     dist_offset = st.sidebar.slider("Jarak Label Stesen ke Luar", 0.5, 5.0, 1.5)
 
-    # ================== BACA DATA ==================
+    # ================== BACA DATA & AUTO-DISPLAY ==================
     if uploaded_file is not None:
-        st.session_state.show_map = True 
-        
         try:
+            # Menggunakan pandas untuk baca data
             df = pd.read_csv(uploaded_file)
             
             if all(col in df.columns for col in ['STN', 'E', 'N']):
+                # 1. AUTO-ON: Aktifkan peta secara automatik apabila file wujud
+                st.session_state.show_map = True
                 
-                transformer = Transformer.from_crs("EPSG:4390", "EPSG:4326", always_xy=True)
-                df['lon'], df['lat'] = transformer.transform(df['E'].values, df['N'].values)
+                # 2. Transformasi Koordinat (Guna cache untuk kelajuan)
+                df['lon'], df['lat'] = transform_coords(df)
                 
+                # 3. Pengiraan Geometri
                 coords_en = list(zip(df['E'], df['N']))
                 coords_ll = list(zip(df['lon'], df['lat']))
                 poly_geom = Polygon(coords_en)
@@ -285,7 +287,7 @@ if check_password():
                 centroid_m = poly_geom.centroid
                 area = poly_geom.area
 
-                # --- 💾 EKSPORT QGIS ---
+                # --- 💾 EKSPORT QGIS (SIDEBAR) ---
                 st.sidebar.markdown("---")
                 st.sidebar.subheader("💾 Eksport Data")
                 geojson_dict = {
@@ -304,10 +306,12 @@ if check_password():
                     use_container_width=True
                 )
 
-                st.markdown("---")
+                st.markdown("### 🗺️ Paparan Hasil Survey")
 
+                # Tentukan paparan berdasarkan status 'show_interactive_map' 
+                # (Secara default akan terus ke folium jika toggle On)
                 if show_interactive_map:
-                    # --- MOD PETA INTERAKTIF ---
+                    # --- MOD PETA INTERAKTIF (FOLIUM) ---
                     google_map_url = 'https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}'
                     if map_provider == "Standard Map":
                         google_map_url = 'https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}'
@@ -315,7 +319,7 @@ if check_password():
                     m = folium.Map(location=[df['lat'].mean(), df['lon'].mean()], zoom_start=20, max_zoom=22, tiles=google_map_url, attr='Google')
                     points_map = [[r['lat'], r['lon']] for _, r in df.iterrows()]
                     
-                    # --- POPUP UNTUK LOT ---
+                    # Popup Lot
                     lot_info = f"<b>INFO LOT</b><br>Luas: {area:.2f} m²<br>Bilangan Stesen: {len(df)}"
                     folium.Polygon(
                         locations=points_map, 
@@ -327,34 +331,38 @@ if check_password():
                         popup=folium.Popup(lot_info, max_width=200)
                     ).add_to(m)
                     
+                    # Marker Stesen & Data Bearing/Jarak
                     for i in range(len(df)):
                         p1, p2 = df.iloc[i], df.iloc[(i + 1) % len(df)]
                         dE, dN = p2['E'] - p1['E'], p2['N'] - p1['N']
                         dist, bear = np.sqrt(dE**2 + dN**2), (np.degrees(np.arctan2(dE, dN)) + 360) % 360
+                        
+                        # Pengiraan sudut teks
                         angle = -np.degrees(np.arctan2(p2['lat'] - p1['lat'], p2['lon'] - p1['lon']))
                         if angle > 90: angle -= 180
                         elif angle < -90: angle += 180
                         
-                        # --- POPUP UNTUK STESEN ---
-                        stn_info = f"<b>STESEN {int(p1['STN'])}</b><br>E: {p1['E']:.3f}<br>N: {p1['N']:.3f}"
-                        
                         v_offset = -20 if dN >= 0 else -10
+                        
+                        # Label Bearing & Jarak
                         folium.Marker([ (p1['lat'] + p2['lat']) / 2, (p1['lon'] + p2['lon']) / 2],
                             icon=folium.DivIcon(html=f'''<div style="transform: rotate({angle}deg); text-align: center; width: 160px; margin-left: -80px; margin-top: {v_offset}px;">
                                 <div style="font-size: {label_size_data}pt; color: white; text-shadow: 2px 2px 3px black; font-weight: bold;">{format_dms(bear)}<br><span style="color: #FFD700;">{dist:.2f}m</span></div></div>''')).add_to(m)
                         
+                        # Icon Stesen
                         folium.Marker(
                             [p1['lat'], p1['lon']], 
-                            popup=folium.Popup(stn_info, max_width=150),
+                            popup=folium.Popup(f"<b>STN {int(p1['STN'])}</b>", max_width=150),
                             icon=folium.DivIcon(html=f'''<div style="background-color: white; border: 2px solid red; border-radius: 50%; width: {label_size_stn}px; height: {label_size_stn}px; display: flex; align-items: center; justify-content: center; font-size: {label_size_stn*0.6}px; font-weight: bold; color: black; margin-left: -{label_size_stn/2}px; margin-top: -{label_size_stn/2}px; box-shadow: 1px 1px 3px rgba(0,0,0,0.5);">{int(p1["STN"])}</div>''')
                         ).add_to(m)
 
                     if show_luas_label:
                         folium.Marker([df['lat'].mean(), df['lon'].mean()], icon=folium.DivIcon(html=f'<div style="font-size: {label_size_luas}pt; color: #00FF00; text-shadow: 3px 3px 5px black; font-weight: 900; width: 250px; text-align: center; margin-left: -125px;">{area:.2f} m²</div>')).add_to(m)
-                    st_folium(m, width=1400, height=600)
+                    
+                    st_folium(m, width=1400, height=600, returned_objects=[])
 
                 else:
-                    # --- MOD MATPLOTLIB ---
+                    # --- MOD MATPLOTLIB (Jika Satellite Off) ---
                     if plot_theme == "Dark Mode": bg_color, grid_color = "#121212", "#555555"
                     elif plot_theme == "Blueprint": bg_color, grid_color = "#003366", "#004080"
                     else: bg_color, grid_color = "#ffffff", "#aaaaaa"
@@ -383,9 +391,17 @@ if check_password():
                         ax.text((p1['E']+p2['E'])/2, (p1['N']+p2['N'])/2, f"{format_dms(bear)}\n{dist:.2f}m", fontsize=label_size_data, color='brown', fontweight='bold', ha='center', rotation=txt_angle)
                         ax.scatter(p1['E'], p1['N'], color='white', edgecolor='red', s=300, zorder=5, linewidth=2)
                         ax.text(p1['E'], p1['N'], str(int(p1['STN'])), fontsize=label_size_stn/2, color='black', fontweight='bold', ha='center', va='center', zorder=6)
-                    ax.set_aspect("equal"); st.pyplot(fig)
+                    
+                    ax.set_aspect("equal")
+                    st.pyplot(fig)
 
-            else: st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
+            else:
+                st.error("❌ Fail CSV tidak lengkap! Pastikan ada kolum STN, E, dan N.")
 
-        except Exception as e: st.error(f"❌ Ada ralat: {e}")
+        except Exception as e:
+            st.error(f"❌ Ralat memproses fail: {e}")
+    else:
+        # Paparan jika belum upload fail
+        st.info("👋 Selamat datang! Sila muat naik fail CSV di sidebar untuk melihat peta lot secara automatik.")
+
 
