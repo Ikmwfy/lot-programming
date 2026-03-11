@@ -69,12 +69,13 @@ def check_password():
         with col_mid:
             st.markdown("<h2 style='text-align: center;'>Survey Lot Rumah</h2>", unsafe_allow_html=True)
             
-            # Menggunakan st.form supaya butang 'Enter' boleh berfungsi
+            # Membungkus input ke dalam form supaya butang Enter berfungsi
             with st.form("login_form"):
                 user_id = st.text_input("👤 Masukkan ID:", key="user_id")
                 password = st.text_input("🔑 Masukkan Kata Laluan:", type="password", key="user_pass")
+                st.markdown("<br>", unsafe_allow_html=True)
                 
-                # Butang log masuk mesti jenis form_submit_button
+                # submit_button dalam form membolehkan aksi 'Enter'
                 submit_button = st.form_submit_button("Log Masuk", use_container_width=True)
                 
                 if submit_button:
@@ -84,7 +85,7 @@ def check_password():
                     else:
                         st.error("😕 ID atau Kata Laluan salah.")
             
-            # Butang lupa kata laluan diletakkan di luar form (pilihan)
+            # Butang lupa kata laluan diletakkan di luar form supaya tidak bercampur logik enter
             if st.button("❓ Lupa Kata Laluan?", use_container_width=True):
                 reset_password_dialog()
                 
@@ -410,6 +411,7 @@ if check_password():
     else:
         # Paparan jika belum upload fail
         st.info("👋 Selamat datang! Sila muat naik fail CSV di sidebar untuk melihat peta lot secara automatik.")
+
 
 
 
