@@ -246,13 +246,19 @@ if check_password():
     st.sidebar.header("⚙️ Tetapan Paparan")
     uploaded_file = st.sidebar.file_uploader("Upload fail CSV", type=["csv"])
 
+    # --- PILIHAN MOD PETA (Ubah bahagian ini) ---
     st.sidebar.markdown("---")
     st.sidebar.subheader("🌍 Mod Peta Interaktif")
     
-    if "show_map" not in st.session_state:
-        st.session_state.show_map = False
-        
-    show_interactive_map = st.sidebar.toggle("On/Off Peta Satelit", value=st.session_state.show_map)
+    # Jika file diupload, kita paksa show_interactive_map jadi True
+    default_map_state = True if uploaded_file is not None else False
+    
+    show_interactive_map = st.sidebar.toggle(
+        "On/Off Peta Satelit", 
+        value=st.session_state.get("show_map", default_map_state)
+    )
+    
+    # Simpan status dalam session_state
     st.session_state.show_map = show_interactive_map
     
     map_provider = st.sidebar.radio("Pilih Jenis Peta:", ["Satelit (Hybrid)", "Standard Map"], disabled=not show_interactive_map)
@@ -400,6 +406,7 @@ if check_password():
             else: st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
 
         except Exception as e: st.error(f"❌ Ada ralat: {e}")
+
 
 
 
