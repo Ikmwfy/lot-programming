@@ -333,17 +333,17 @@ if check_password():
                     points_map = [[r['lat'], r['lon']] for _, r in df.iterrows()]
                     
                    # Masukkan {perimeter:.2f} ke dalam string lot_info
-                lot_info = f"<b>INFO LOT</b><br>Luas: {area:.2f} m²<br>Perimeter: {perimeter:.2f} m<br>Bilangan Stesen: {len(df)}"
+                   lot_info = f"<b>INFO LOT</b><br>Luas: {area:.2f} m²<br>Perimeter: {perimeter:.2f} m<br>Bilangan Stesen: {len(df)}"
                 
-                folium.Polygon(
-                    locations=points_map, 
-                    color=line_color, 
-                    weight=3, 
-                    fill=True, 
-                    fill_color=poly_color, 
-                    fill_opacity=poly_opacity,
-                    popup=folium.Popup(lot_info, max_width=200)
-                ).add_to(m)
+                   folium.Polygon(
+                       locations=points_map, 
+                       color=line_color, 
+                       weight=3, 
+                       fill=True, 
+                       fill_color=poly_color, 
+                       fill_opacity=poly_opacity,
+                       popup=folium.Popup(lot_info, max_width=200)
+                   ).add_to(m)
                     
                     for i in range(len(df)):
                         p1, p2 = df.iloc[i], df.iloc[(i + 1) % len(df)]
@@ -412,6 +412,7 @@ if check_password():
             else: st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
 
         except Exception as e: st.error(f"❌ Ada ralat: {e}")
+
 
 
 
