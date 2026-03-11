@@ -12,10 +12,34 @@ import base64
 
 st.set_page_config(layout="wide")
 
+# ================== FUNGSI OPTIMASI (CACHING) ==================
+@st.cache_data
 def get_video_base64(video_file):
-    with open(video_file, "rb") as f:
-        data = f.read()
-    return base64.b64encode(data).decode()
+    try:
+        if os.path.exists(video_file):
+            with open(video_file, "rb") as f:
+                data = f.read()
+            return base64.b64encode(data).decode()
+    except:
+        return None
+    return None
+
+@st.cache_data
+def get_image_base64(img_path):
+    try:
+        if os.path.exists(img_path):
+            with open(img_path, "rb") as f:
+                return base64.b64encode(f.read()).decode()
+    except:
+        return ""
+    return ""
+
+# Fungsi transformasi koordinat dicache supaya tidak dikira berulang kali
+@st.cache_data
+def transform_coords(df_data):
+    transformer = Transformer.from_crs("EPSG:4390", "EPSG:4326", always_xy=True)
+    lon, lat = transformer.transform(df_data['E'].values, df_data['N'].values)
+    return lon, lat
 
 # ================== FUNGSI TUKAR DMS ==================
 def format_dms(decimal_degree):
@@ -364,3 +388,4 @@ if check_password():
             else: st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
 
         except Exception as e: st.error(f"❌ Ada ralat: {e}")
+
