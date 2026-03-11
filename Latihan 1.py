@@ -283,26 +283,14 @@ if check_password():
 
     # ================== BACA DATA ==================
     # ================== BACA DATA ==================
-if uploaded_file is not None:
-    # 1. Simpan dalam session_state supaya data kekal
-    if "df" not in st.session_state:
-        st.session_state.df = pd.read_csv(uploaded_file)
-    
-    df = st.session_state.df # Gunakan data dari session_state
-    
-    # 2. Proses data hanya jika df wujud
-    if df is not None and all(col in df.columns for col in ['STN', 'E', 'N']):
-        # ... (letakkan kod pengiraan koordinat anda di sini) ...
-    else:
-        st.error("❌ Kolum STN, E, N tidak dijumpai dalam CSV!")
-
-else:
-    # Jika tiada fail, kosongkan session_state
-    if "df" in st.session_state:
-        del st.session_state.df
-    st.info("Sila muat naik fail CSV di sidebar untuk bermula.")
-
-# Gantikan pd.read_csv(uploaded_file) dengan fungsi di atas
+    if uploaded_file is not None:
+        # 1. Pastikan session state diaktifkan
+        if st.session_state.show_map == False:
+            st.session_state.show_map = True
+            st.rerun() # Ini kunci supaya peta terus keluar tanpa perlu klik manual
+        
+        try:
+            df = pd.read_csv(uploaded_file)
             # ... (selebihnya kod anda kekal sama) ...
             
             if all(col in df.columns for col in ['STN', 'E', 'N']):
@@ -431,22 +419,6 @@ else:
             else: st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
 
         except Exception as e: st.error(f"❌ Ada ralat: {e}")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
