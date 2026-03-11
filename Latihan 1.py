@@ -11,7 +11,7 @@ from pyproj import Transformer
 import base64
 
 st.set_page_config(
-    page_title="urvey Lot Rumah",  # Inilah yang akan menukar nama pada tab
+    page_title="Survey Lot Rumah",  # Inilah yang akan menukar nama pada tab
     page_icon="🏠",                  # Anda boleh letak emoji atau laluan fail gambar
     layout="wide"
 )
@@ -419,6 +419,7 @@ if check_password():
             else: st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
 
         except Exception as e: st.error(f"❌ Ada ralat: {e}")
+
 
 
 
