@@ -41,17 +41,44 @@ def reset_password_dialog():
 
 def check_password():
     if "password_correct" not in st.session_state:
+        # 1. Masukkan video latar belakang (Gunakan caching untuk prestasi)
+        if os.path.exists("PASSWORD.mp4"):
+            video_base64 = get_video_base64("PASSWORD.mp4")
+            st.markdown(f"""
+                <style>
+                .stApp {{
+                    background: none;
+                }}
+                .bg-video {{
+                    position: fixed;
+                    right: 0;
+                    bottom: 0;
+                    min-width: 100%;
+                    min-height: 100%;
+                    width: auto;
+                    height: auto;
+                    z-index: -1;
+                    object-fit: cover;
+                }}
+                </style>
+                <video autoplay loop muted playsinline class="bg-video">
+                    <source src="data:video/mp4;base64,{video_base64}" type="video/mp4">
+                </video>
+            """, unsafe_allow_html=True)
+
+        # 2. Letakkan kotak login di atas video
         _, col_mid, _ = st.columns([1, 1.5, 1])
         with col_mid:
-            st.markdown("<h2 style='text-align: center;'>Survey Lot Rumah</h2>", unsafe_allow_html=True)
+            # Tambahkan sedikit latar belakang lutsinar supaya teks mudah dibaca
+            st.markdown("""
+                <div style="background-color: rgba(255, 255, 255, 0.8); padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+            """, unsafe_allow_html=True)
             
-            # Mula menggunakan form
+            st.markdown("<h2 style='text-align: center; color: #333;'>Survey Lot Rumah</h2>", unsafe_allow_html=True)
+            
             with st.form("login_form"):
                 user_id = st.text_input("👤 Masukkan ID:", key="user_id")
                 password = st.text_input("🔑 Masukkan Kata Laluan:", type="password", key="user_pass")
-                st.markdown("<br>", unsafe_allow_html=True)
-                
-                # Butang di dalam form akan triggered jika tekan Enter
                 submit_button = st.form_submit_button("Log Masuk", use_container_width=True)
                 
                 if submit_button:
@@ -61,13 +88,14 @@ def check_password():
                     else:
                         st.error("😕 ID atau Kata Laluan salah.")
             
-            # Butang "Lupa Kata Laluan" letak di luar form supaya tidak trigger submit
             if st.button("❓ Lupa Kata Laluan?", use_container_width=True):
                 reset_password_dialog()
+            
+            st.markdown("</div>", unsafe_allow_html=True) # Tutup div latar belakang
                 
         return False
     return True
-
+    
 # ================== MAIN APP (SELEPAS LOGIN) ==================
 if check_password():
     
@@ -372,5 +400,6 @@ if check_password():
             else: st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
 
         except Exception as e: st.error(f"❌ Ada ralat: {e}")
+
 
 
