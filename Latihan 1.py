@@ -369,7 +369,14 @@ if check_password():
 
                     if show_luas_label:
                         folium.Marker([df['lat'].mean(), df['lon'].mean()], icon=folium.DivIcon(html=f'<div style="font-size: {label_size_luas}pt; color: #00FF00; text-shadow: 3px 3px 5px black; font-weight: 900; width: 250px; text-align: center; margin-left: -125px;">{area:.2f} m²</div>')).add_to(m)
-                    st_folium(m, width=1400, height=600)
+                    # Tambah parameter 'returned_objects=[]' untuk mengelakkan re-run apabila berinteraksi dengan peta
+    st_folium(
+    m, 
+    width=1400, 
+    height=600, 
+    returned_objects=[], 
+    key="my_map"
+)
 
                 else:
                     # --- MOD MATPLOTLIB ---
@@ -406,6 +413,7 @@ if check_password():
             else: st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
 
         except Exception as e: st.error(f"❌ Ada ralat: {e}")
+
 
 
 
