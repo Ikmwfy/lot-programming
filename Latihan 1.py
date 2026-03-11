@@ -275,25 +275,25 @@ st.session_state.show_map = show_interactive_map
 
 map_provider = st.sidebar.radio("Pilih Jenis Peta:", ["Satelit (Hybrid)", "Standard Map"], disabled=not show_interactive_map)
 
-    # --- PILIHAN WARNA ---
-    st.sidebar.markdown("---")
-    st.sidebar.subheader("🎨 Pilihan Warna")
-    poly_color = st.sidebar.color_picker("Warna Kawasan (Poligon)", "#6036AF") 
-    line_color = st.sidebar.color_picker("Warna Garisan Sempadan", "#FFFF00") 
-    poly_opacity = st.sidebar.slider("Kelegapan Kawasan", 0.0, 1.0, 0.3)
+# --- PILIHAN WARNA ---
+st.sidebar.markdown("---")
+st.sidebar.subheader("🎨 Pilihan Warna")
+poly_color = st.sidebar.color_picker("Warna Kawasan (Poligon)", "#6036AF") 
+line_color = st.sidebar.color_picker("Warna Garisan Sempadan", "#FFFF00") 
+poly_opacity = st.sidebar.slider("Kelegapan Kawasan", 0.0, 1.0, 0.3)
 
-    st.sidebar.markdown("---")
-    plot_theme = st.sidebar.selectbox("Tema Warna Pelan Matplotlib", ["Light Mode", "Dark Mode", "Blueprint"])
-    show_bg_grid = st.sidebar.checkbox("Papar Grid Latar", value=True)
-    grid_interval = st.sidebar.slider("Jarak Selang Grid", 5, 50, 10)
+st.sidebar.markdown("---")
+plot_theme = st.sidebar.selectbox("Tema Warna Pelan Matplotlib", ["Light Mode", "Dark Mode", "Blueprint"])
+show_bg_grid = st.sidebar.checkbox("Papar Grid Latar", value=True)
+grid_interval = st.sidebar.slider("Jarak Selang Grid", 5, 50, 10)
 
-    st.sidebar.markdown("---")
-    st.sidebar.subheader("🖋️ Gaya Label")
-    show_luas_label = st.sidebar.checkbox("Papar Label LUAS", value=True)
-    label_size_stn = st.sidebar.slider("Saiz Bulatan Stesen", 15, 30, 22) 
-    label_size_data = st.sidebar.slider("Saiz Bearing/Jarak", 5, 12, 7)
-    label_size_luas = st.sidebar.slider("Saiz Tulisan LUAS", 8, 30, 14) 
-    dist_offset = st.sidebar.slider("Jarak Label Stesen ke Luar", 0.5, 5.0, 1.5)
+st.sidebar.markdown("---")
+st.sidebar.subheader("🖋️ Gaya Label")
+show_luas_label = st.sidebar.checkbox("Papar Label LUAS", value=True)
+label_size_stn = st.sidebar.slider("Saiz Bulatan Stesen", 15, 30, 22) 
+label_size_data = st.sidebar.slider("Saiz Bearing/Jarak", 5, 12, 7)
+label_size_luas = st.sidebar.slider("Saiz Tulisan LUAS", 8, 30, 14) 
+dist_offset = st.sidebar.slider("Jarak Label Stesen ke Luar", 0.5, 5.0, 1.5)
 
     # ================== BACA DATA & AUTO-DISPLAY ==================
     if uploaded_file is not None:
@@ -433,6 +433,7 @@ map_provider = st.sidebar.radio("Pilih Jenis Peta:", ["Satelit (Hybrid)", "Stand
     else:
         # Paparan jika belum upload fail
         st.info("👋 Selamat datang! Sila muat naik fail CSV di sidebar untuk melihat peta lot secara automatik.")
+
 
 
 
