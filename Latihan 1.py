@@ -246,19 +246,13 @@ if check_password():
     st.sidebar.header("⚙️ Tetapan Paparan")
     uploaded_file = st.sidebar.file_uploader("Upload fail CSV", type=["csv"])
 
-    # --- PILIHAN MOD PETA (Ubah bahagian ini) ---
     st.sidebar.markdown("---")
     st.sidebar.subheader("🌍 Mod Peta Interaktif")
     
-    # Jika file diupload, kita paksa show_interactive_map jadi True
-    default_map_state = True if uploaded_file is not None else False
-    
-    show_interactive_map = st.sidebar.toggle(
-        "On/Off Peta Satelit", 
-        value=st.session_state.get("show_map", default_map_state)
-    )
-    
-    # Simpan status dalam session_state
+    if "show_map" not in st.session_state:
+        st.session_state.show_map = False
+        
+    show_interactive_map = st.sidebar.toggle("On/Off Peta Satelit", value=st.session_state.show_map)
     st.session_state.show_map = show_interactive_map
     
     map_provider = st.sidebar.radio("Pilih Jenis Peta:", ["Satelit (Hybrid)", "Standard Map"], disabled=not show_interactive_map)
@@ -284,11 +278,16 @@ if check_password():
     dist_offset = st.sidebar.slider("Jarak Label Stesen ke Luar", 0.5, 5.0, 1.5)
 
     # ================== BACA DATA ==================
+    # ================== BACA DATA ==================
     if uploaded_file is not None:
-        st.session_state.show_map = True 
+        # 1. Pastikan session state diaktifkan
+        if st.session_state.show_map == False:
+            st.session_state.show_map = True
+            st.rerun() # Ini kunci supaya peta terus keluar tanpa perlu klik manual
         
         try:
             df = pd.read_csv(uploaded_file)
+            # ... (selebihnya kod anda kekal sama) ...
             
             if all(col in df.columns for col in ['STN', 'E', 'N']):
                 
@@ -369,14 +368,7 @@ if check_password():
 
                     if show_luas_label:
                         folium.Marker([df['lat'].mean(), df['lon'].mean()], icon=folium.DivIcon(html=f'<div style="font-size: {label_size_luas}pt; color: #00FF00; text-shadow: 3px 3px 5px black; font-weight: 900; width: 250px; text-align: center; margin-left: -125px;">{area:.2f} m²</div>')).add_to(m)
-                    # Tambah parameter 'returned_objects=[]' untuk mengelakkan re-run apabila berinteraksi dengan peta
-    st_folium(
-    m, 
-    width=1400, 
-    height=600, 
-    returned_objects=[], 
-    key="my_map"
-)
+                    st_folium(m, width=1400, height=600)
 
                 else:
                     # --- MOD MATPLOTLIB ---
@@ -413,9 +405,6 @@ if check_password():
             else: st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
 
         except Exception as e: st.error(f"❌ Ada ralat: {e}")
-
-
-
 
 
 
