@@ -332,7 +332,10 @@ if check_password():
                     m = folium.Map(location=[df['lat'].mean(), df['lon'].mean()], zoom_start=20, max_zoom=22, tiles=google_map_url, attr='Google')
                     points_map = [[r['lat'], r['lon']] for _, r in df.iterrows()]
                     
-                    # Masukkan {perimeter:.2f} ke dalam string lot_info
+                    # TAMBAH BARIS INI UNTUK MENGIRA PERIMETER
+                    perimeter = line_geom.length
+                    
+                    # Sekarang 'perimeter' sudah wujud dan boleh digunakan
                     lot_info = f"<b>INFO LOT</b><br>Luas: {area:.2f} m²<br>Perimeter: {perimeter:.2f} m<br>Bilangan Stesen: {len(df)}"
                 
                     folium.Polygon(
@@ -412,6 +415,7 @@ if check_password():
             else: st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
 
         except Exception as e: st.error(f"❌ Ada ralat: {e}")
+
 
 
 
