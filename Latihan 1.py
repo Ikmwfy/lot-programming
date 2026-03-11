@@ -284,7 +284,6 @@ if check_password():
     # ================== BACA DATA ==================
     # ================== BACA DATA ==================
     if uploaded_file is not None:
-        df = process_survey_data(uploaded_file)
         # 1. Pastikan session state diaktifkan
         if st.session_state.show_map == False:
             st.session_state.show_map = True
@@ -424,6 +423,7 @@ if check_password():
             else: st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
 
         except Exception as e: st.error(f"❌ Ada ralat: {e}")
+
 
 
 
