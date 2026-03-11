@@ -430,9 +430,10 @@ if uploaded_file is not None:
 
         except Exception as e:
             st.error(f"❌ Ralat memproses fail: {e}")
-    else:
-        # Paparan jika belum upload fail
-        st.info("👋 Selamat datang! Sila muat naik fail CSV di sidebar untuk melihat peta lot secara automatik.")
+else:
+    # Paparan jika belum upload fail
+    st.info("👋 Selamat datang! Sila muat naik fail CSV di sidebar untuk melihat peta lot secara automatik.")
+
 
 
 
