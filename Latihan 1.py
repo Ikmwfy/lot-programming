@@ -307,23 +307,49 @@ if check_password():
                 area = poly_geom.area
 
                 # --- 💾 EKSPORT QGIS ---
-                st.sidebar.markdown("---")
-                st.sidebar.subheader("💾 Eksport Data")
-                geojson_dict = {
-                    "type": "FeatureCollection",
-                    "features": [{
-                        "type": "Feature",
-                        "geometry": mapping(poly_ll),
-                        "properties": {"Area_sqm": round(area, 2), "Stations": len(df)}
-                    }]
-                }
-                st.sidebar.download_button(
-                    label="🚀 Export to QGIS (.geojson)",
-                    data=json.dumps(geojson_dict),
-                    file_name="survey_lot.geojson",
-                    mime="application/json",
-                    use_container_width=True
-                )
+                # --- 💾 EKSPORT QGIS YANG LEBIH LENGKAP ---
+st.sidebar.markdown("---")
+st.sidebar.subheader("💾 Eksport Data")
+
+# Bina senarai ciri (features) yang mengandungi koordinat dan maklumat setiap sisi
+features = []
+
+# 1. Tambah Poligon Utama
+features.append({
+    "type": "Feature",
+    "geometry": mapping(poly_ll),
+    "properties": {
+        "Name": "Lot Sempadan",
+        "Area_sqm": round(area, 2),
+        "Perimeter_m": round(perimeter, 2),
+        "Total_Stations": len(df)
+    }
+})
+
+# 2. Tambah setiap titik stesen sebagai point agar mudah dilihat di QGIS
+for _, row in df.iterrows():
+    features.append({
+        "type": "Feature",
+        "geometry": {"type": "Point", "coordinates": [row['lon'], row['lat']]},
+        "properties": {
+            "Station": int(row['STN']),
+            "Easting": row['E'],
+            "Northing": row['N']
+        }
+    })
+
+geojson_dict = {
+    "type": "FeatureCollection",
+    "features": features
+}
+
+st.sidebar.download_button(
+    label="🚀 Export to QGIS (.geojson)",
+    data=json.dumps(geojson_dict),
+    file_name="survey_lot_lengkap.geojson",
+    mime="application/json",
+    use_container_width=True
+)
 
                 st.markdown("---")
 
@@ -419,6 +445,7 @@ if check_password():
             else: st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
 
         except Exception as e: st.error(f"❌ Ada ralat: {e}")
+
 
 
 
