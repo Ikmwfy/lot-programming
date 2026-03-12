@@ -307,40 +307,54 @@ if check_password():
                 area = poly_geom.area
 
                 # --- 💾 EKSPORT QGIS ---
-               # --- 💾 EKSPORT QGIS (DENGAN DATA LENGKAP) ---
+              # --- 💾 EKSPORT QGIS (DENGAN LAYER LENGKAP) ---
                 st.sidebar.markdown("---")
                 st.sidebar.subheader("💾 Eksport Data")
                 
                 features = []
                 
-                # 1. Tambah Poligon Utama
+                # 1. Layer Polygon (Kawasan)
                 features.append({
                     "type": "Feature",
                     "geometry": mapping(poly_ll),
-                    "properties": {"Type": "Lot", "Area_sqm": round(area, 2), "Stations": len(df)}
+                    "properties": {
+                        "Layer": "Lot_Kawasan",
+                        "Area_sqm": round(area, 2),
+                        "Perimeter": round(line_geom.length, 2)
+                    }
                 })
                 
-                # 2. Tambah Setiap Garisan (Sempadan) berserta atribut
+                # 2. Layer Line (Sempadan dengan Bearing & Jarak)
                 for i in range(len(df)):
                     p1, p2 = df.iloc[i], df.iloc[(i + 1) % len(df)]
-                    
-                    # Kiraan Bearing & Jarak
                     dE, dN = p2['E'] - p1['E'], p2['N'] - p1['N']
                     dist = np.sqrt(dE**2 + dN**2)
                     bear = (np.degrees(np.arctan2(dE, dN)) + 360) % 360
                     
-                    # Cipta garisan untuk segmen ini
                     line_seg = LineString([(p1['lon'], p1['lat']), (p2['lon'], p2['lat'])])
-                    
                     features.append({
                         "type": "Feature",
                         "geometry": mapping(line_seg),
                         "properties": {
-                            "Type": "Boundary",
+                            "Layer": "Sempadan",
                             "From_Stn": int(p1['STN']),
                             "To_Stn": int(p2['STN']),
                             "Bearing": format_dms(bear),
-                            "Distance_m": round(dist, 3)
+                            "Distance": round(dist, 3)
+                        }
+                    })
+                
+                # 3. Layer Point (Stesen/Batu Sempadan)
+                for i in range(len(df)):
+                    pt = Point(df.iloc[i]['lon'], df.iloc[i]['lat'])
+                    features.append({
+                        "type": "Feature",
+                        "geometry": mapping(pt),
+                        "properties": {
+                            "Layer": "Batu_Sempadan",
+                            "Station_ID": int(df.iloc[i]['STN']),
+                            "Easting": round(df.iloc[i]['E'], 3),
+                            "Northing": round(df.iloc[i]['N'], 3)
                         }
                     })
 
@@ -349,7 +363,7 @@ if check_password():
                 st.sidebar.download_button(
                     label="🚀 Export to QGIS (.geojson)",
                     data=json.dumps(geojson_dict),
-                    file_name="survey_lot_lengkap.geojson",
+                    file_name="survey_lot_qgis.geojson",
                     mime="application/json",
                     use_container_width=True
                 )
@@ -448,6 +462,7 @@ if check_password():
             else: st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
 
         except Exception as e: st.error(f"❌ Ada ralat: {e}")
+
 
 
 
