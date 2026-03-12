@@ -126,18 +126,15 @@ if check_password():
         <p style="color: #00d4ff; ...">{role}</p>
         
         st.sidebar.markdown(f"""
-            <div class="sidebar-profile-container">
-                <video autoplay loop muted playsinline class="sidebar-video-bg">
-                    <source src="data:video/mp4;base64,{bg_video_base64}" type="video/mp4">
-                </video>
-                <div class="sidebar-profile-content">
-                    <div class="icon-wrapper">
-                        <img src="data:image/png;base64,{icon_base64}" class="sidebar-icon">
-                    </div>
-                    <h3 style="color: white; margin-top: 10px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-weight: 700; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">Hai, Malfoy!</h3>
-                    <p style="color: #00d4ff; font-size: 0.9em; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;">Student</p>
-                </div>
+    <div class="sidebar-profile-container">
+        <div class="sidebar-profile-content">
+            <div class="icon-wrapper">
+                <img src="data:image/png;base64,{icon_base64}" class="sidebar-icon">
             </div>
+            <h3 style="color: white; margin-top: 10px; font-family: 'Segoe UI', sans-serif; font-weight: 700; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">Hai, {st.session_state.get('user_nama', 'User')}!</h3>
+            <p style="color: #00d4ff; font-size: 0.9em; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;">{st.session_state.get('user_role', 'Student')}</p>
+        </div>
+    </div>
             
             <style>
             .sidebar-profile-container {{
@@ -486,6 +483,7 @@ if check_password():
             else: st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
 
         except Exception as e: st.error(f"❌ Ada ralat: {e}")
+
 
 
 
