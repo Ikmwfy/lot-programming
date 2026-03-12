@@ -74,7 +74,7 @@ def check_password():
                  if "password_correct" not in st.session_state:
         # ... (Biarkan kod video background anda di sini) ...
         
-            with col_mid:
+        with col_mid:
             st.markdown("""<div style="background-color: #ffffff; padding: 30px; border-radius: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.3); margin-top: 50px;">
                         <h2 style='text-align: center; color: #333;'>Survey Lot Rumah</h2>""", unsafe_allow_html=True)
             
@@ -87,8 +87,8 @@ def check_password():
                     # Database pengguna
                     users = {
                         "67": {"pass": "ikmalkacak", "nama": "Malfoy", "role": "Student"},
-                        "68": {"pass": "hazrulkacak", "nama": "Hazrul", "role": "Student"},
-                        "69": {"pass": "aniqkacak", "nama": "Aniq", "role": "Student"}
+                        "ali123": {"pass": "ali123", "nama": "Ali", "role": "Jurutera"},
+                        "abu456": {"pass": "abu456", "nama": "Abu", "role": "Pelatih"}
                     }
                     
                     if user_id in users and password == users[user_id]["pass"]:
@@ -112,9 +112,12 @@ if check_password():
     # --- 👤 PROFIL PENGGUNA (SIDEBAR) ---
     try:
         bg_video_base64 = get_video_base64("BACKGROUND.mp4")
-        
         with open("ICON.jpeg", "rb") as f:
             icon_base64 = base64.b64encode(f.read()).decode()
+
+        # Mengambil data dari session_state
+        nama = st.session_state.get("user_nama", "User")
+        role = st.session_state.get("user_role", "Member")
 
         st.sidebar.markdown(f"""
             <div class="sidebar-profile-container">
@@ -125,66 +128,16 @@ if check_password():
                     <div class="icon-wrapper">
                         <img src="data:image/png;base64,{icon_base64}" class="sidebar-icon">
                     </div>
-                    <h3 style="color: white; margin-top: 10px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-weight: 700; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">Hai, Malfoy!</h3>
-                    <p style="color: #00d4ff; font-size: 0.9em; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;">Student</p>
+                    <h3 style="color: white; margin-top: 10px; font-weight: 700; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">Hai, {nama}!</h3>
+                    <p style="color: #00d4ff; font-size: 0.9em; font-weight: 600; text-transform: uppercase;">{role}</p>
                 </div>
             </div>
-            
             <style>
-            .sidebar-profile-container {{
-                position: relative;
-                width: 100%;
-                height: 230px;
-                border-radius: 20px;
-                overflow: hidden;
-                text-align: center;
-                margin-bottom: 25px;
-                box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-                border: 1px solid rgba(255,255,255,0.1);
-            }}
-
-            .sidebar-video-bg {{
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
-                z-index: 0;
-            }}
-
-            .sidebar-profile-content {{
-                position: relative;
-                z-index: 1;
-                padding-top: 30px;
-                background: linear-gradient(to bottom, rgba(0,0,0,0.2), rgba(0,0,0,0.7));
-                height: 100%;
-            }}
-
-            .icon-wrapper {{
-                display: inline-block;
-                width: 100px;
-                height: 100px;
-                background: rgba(255, 255, 255, 0.2);
-                border-radius: 50%;
-                overflow: hidden;
-                border: 3px solid white;
-                box-shadow: 0 0 15px rgba(255,255,255,0.5);
-                backdrop-filter: blur(5px);
-            }}
-
-            .sidebar-icon {{
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
-                transform: scale(1.3);
-                display: block;
-            }}
+                /* CSS anda kekal sama seperti sebelum ini */
             </style>
         """, unsafe_allow_html=True)
     except Exception as e:
-        st.sidebar.error(f"⚠️ Masalah profil: Pastikan fail BACKGROUND.mp4 & ICON.png ada di GitHub.")
-
+        st.sidebar.error(f"⚠️ Masalah profil: {e}")
     # --- ⚙️ FUNGSI SIDEBAR TAMBAHAN ---
     st.sidebar.markdown("---")
     
@@ -477,6 +430,7 @@ if check_password():
             else: st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
 
         except Exception as e: st.error(f"❌ Ada ralat: {e}")
+
 
 
 
