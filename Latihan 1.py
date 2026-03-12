@@ -117,6 +117,14 @@ if check_password():
         with open("ICON.jpeg", "rb") as f:
             icon_base64 = base64.b64encode(f.read()).decode()
 
+        # Tambah baris ini sebelum st.sidebar.markdown
+        nama = st.session_state.get("user_nama", "User")
+        role = st.session_state.get("user_role", "Student")
+
+        # Kemudian di dalam st.sidebar.markdown tersebut, tukar bahagian ini:
+        <h3 style="color: white; ...">Hai, {nama}!</h3>
+        <p style="color: #00d4ff; ...">{role}</p>
+        
         st.sidebar.markdown(f"""
             <div class="sidebar-profile-container">
                 <video autoplay loop muted playsinline class="sidebar-video-bg">
@@ -478,6 +486,7 @@ if check_password():
             else: st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
 
         except Exception as e: st.error(f"❌ Ada ralat: {e}")
+
 
 
 
