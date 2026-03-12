@@ -74,7 +74,7 @@ def check_password():
                  if "password_correct" not in st.session_state:
         # ... (Biarkan kod video background anda di sini) ...
         
-        with col_mid:
+            with col_mid:
             st.markdown("""<div style="background-color: #ffffff; padding: 30px; border-radius: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.3); margin-top: 50px;">
                         <h2 style='text-align: center; color: #333;'>Survey Lot Rumah</h2>""", unsafe_allow_html=True)
             
@@ -477,6 +477,7 @@ if check_password():
             else: st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
 
         except Exception as e: st.error(f"❌ Ada ralat: {e}")
+
 
 
 
