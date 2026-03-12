@@ -383,7 +383,7 @@ if check_password():
 
                 st.markdown("---")
 
-                if show_interactive_map:
+               if show_interactive_map:
                     # --- MOD PETA INTERAKTIF ---
                     google_map_url = 'https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}'
                     if map_provider == "Standard Map":
@@ -392,12 +392,10 @@ if check_password():
                     m = folium.Map(location=[df['lat'].mean(), df['lon'].mean()], zoom_start=20, max_zoom=22, tiles=google_map_url, attr='Google')
                     points_map = [[r['lat'], r['lon']] for _, r in df.iterrows()]
                     
-                    # TAMBAH BARIS INI UNTUK MENGIRA PERIMETER
                     perimeter = line_geom.length
-                    
-                    # Sekarang 'perimeter' sudah wujud dan boleh digunakan
                     lot_info = f"<b>INFO LOT</b><br>Luas: {area:.2f} m²<br>Perimeter: {perimeter:.2f} m<br>Bilangan Stesen: {len(df)}"
                 
+                    # Poligon dengan Tooltip (Hover effect)
                     folium.Polygon(
                         locations=points_map, 
                         color=line_color, 
@@ -405,7 +403,8 @@ if check_password():
                         fill=True, 
                         fill_color=poly_color, 
                         fill_opacity=poly_opacity,
-                        popup=folium.Popup(lot_info, max_width=200)
+                        popup=folium.Popup(lot_info, max_width=200),
+                        tooltip="Klik untuk info lot penuh" # Hover pada kawasan lot
                     ).add_to(m)
                     
                     for i in range(len(df)):
@@ -416,7 +415,6 @@ if check_password():
                         if angle > 90: angle -= 180
                         elif angle < -90: angle += 180
                         
-                        # --- POPUP UNTUK STESEN ---
                         stn_info = f"<b>STESEN {int(p1['STN'])}</b><br>E: {p1['E']:.3f}<br>N: {p1['N']:.3f}"
                         
                         v_offset = -20 if dN >= 0 else -10
@@ -424,9 +422,11 @@ if check_password():
                             icon=folium.DivIcon(html=f'''<div style="transform: rotate({angle}deg); text-align: center; width: 160px; margin-left: -80px; margin-top: {v_offset}px;">
                                 <div style="font-size: {label_size_data}pt; color: white; text-shadow: 2px 2px 3px black; font-weight: bold;">{format_dms(bear)}<br><span style="color: #FFD700;">{dist:.2f}m</span></div></div>''')).add_to(m)
                         
+                        # Marker Stesen dengan Tooltip (Hover effect)
                         folium.Marker(
                             [p1['lat'], p1['lon']], 
                             popup=folium.Popup(stn_info, max_width=150),
+                            tooltip=f"Stesen {int(p1['STN'])}", # Hover pada batu sempadan
                             icon=folium.DivIcon(html=f'''<div style="background-color: white; border: 2px solid red; border-radius: 50%; width: {label_size_stn}px; height: {label_size_stn}px; display: flex; align-items: center; justify-content: center; font-size: {label_size_stn*0.6}px; font-weight: bold; color: black; margin-left: -{label_size_stn/2}px; margin-top: -{label_size_stn/2}px; box-shadow: 1px 1px 3px rgba(0,0,0,0.5);">{int(p1["STN"])}</div>''')
                         ).add_to(m)
 
@@ -475,6 +475,7 @@ if check_password():
             else: st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
 
         except Exception as e: st.error(f"❌ Ada ralat: {e}")
+
 
 
 
