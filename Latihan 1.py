@@ -84,8 +84,8 @@ def check_password():
                     # Logik database pengguna (seperti yang dibincangkan tadi)
                     users = {
                         "67": {"pass": "ikmalkacak", "nama": "Malfoy", "role": "Student"},
-                        "ali123": {"pass": "ali123", "nama": "Ali", "role": "Jurutera"},
-                        "abu456": {"pass": "abu456", "nama": "Abu", "role": "Pelatih"}
+                        "68": {"pass": "hazrulkacak", "nama": "Hazrul", "role": "Student"},
+                        "69": {"pass": "aniqkacak", "nama": "Aniq", "role": "Student"}
                     }
                     if user_id in users and password == users[user_id]["pass"]:
                         st.session_state["password_correct"] = True
@@ -431,6 +431,7 @@ if check_password():
             else: st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
 
         except Exception as e: st.error(f"❌ Ada ralat: {e}")
+
 
 
 
