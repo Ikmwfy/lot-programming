@@ -307,49 +307,52 @@ if check_password():
                 area = poly_geom.area
 
                 # --- 💾 EKSPORT QGIS ---
-                # --- 💾 EKSPORT QGIS YANG LEBIH LENGKAP ---
-st.sidebar.markdown("---")
-st.sidebar.subheader("💾 Eksport Data")
+               # --- 💾 EKSPORT QGIS (DENGAN DATA LENGKAP) ---
+                st.sidebar.markdown("---")
+                st.sidebar.subheader("💾 Eksport Data")
+                
+                features = []
+                
+                # 1. Tambah Poligon Utama
+                features.append({
+                    "type": "Feature",
+                    "geometry": mapping(poly_ll),
+                    "properties": {"Type": "Lot", "Area_sqm": round(area, 2), "Stations": len(df)}
+                })
+                
+                # 2. Tambah Setiap Garisan (Sempadan) berserta atribut
+                for i in range(len(df)):
+                    p1, p2 = df.iloc[i], df.iloc[(i + 1) % len(df)]
+                    
+                    # Kiraan Bearing & Jarak
+                    dE, dN = p2['E'] - p1['E'], p2['N'] - p1['N']
+                    dist = np.sqrt(dE**2 + dN**2)
+                    bear = (np.degrees(np.arctan2(dE, dN)) + 360) % 360
+                    
+                    # Cipta garisan untuk segmen ini
+                    line_seg = LineString([(p1['lon'], p1['lat']), (p2['lon'], p2['lat'])])
+                    
+                    features.append({
+                        "type": "Feature",
+                        "geometry": mapping(line_seg),
+                        "properties": {
+                            "Type": "Boundary",
+                            "From_Stn": int(p1['STN']),
+                            "To_Stn": int(p2['STN']),
+                            "Bearing": format_dms(bear),
+                            "Distance_m": round(dist, 3)
+                        }
+                    })
 
-# Bina senarai ciri (features) yang mengandungi koordinat dan maklumat setiap sisi
-features = []
-
-# 1. Tambah Poligon Utama
-features.append({
-    "type": "Feature",
-    "geometry": mapping(poly_ll),
-    "properties": {
-        "Name": "Lot Sempadan",
-        "Area_sqm": round(area, 2),
-        "Perimeter_m": round(perimeter, 2),
-        "Total_Stations": len(df)
-    }
-})
-
-# 2. Tambah setiap titik stesen sebagai point agar mudah dilihat di QGIS
-for _, row in df.iterrows():
-    features.append({
-        "type": "Feature",
-        "geometry": {"type": "Point", "coordinates": [row['lon'], row['lat']]},
-        "properties": {
-            "Station": int(row['STN']),
-            "Easting": row['E'],
-            "Northing": row['N']
-        }
-    })
-
-geojson_dict = {
-    "type": "FeatureCollection",
-    "features": features
-}
-
-st.sidebar.download_button(
-    label="🚀 Export to QGIS (.geojson)",
-    data=json.dumps(geojson_dict),
-    file_name="survey_lot_lengkap.geojson",
-    mime="application/json",
-    use_container_width=True
-)
+                geojson_dict = {"type": "FeatureCollection", "features": features}
+                
+                st.sidebar.download_button(
+                    label="🚀 Export to QGIS (.geojson)",
+                    data=json.dumps(geojson_dict),
+                    file_name="survey_lot_lengkap.geojson",
+                    mime="application/json",
+                    use_container_width=True
+                )
 
                 st.markdown("---")
 
@@ -445,7 +448,6 @@ st.sidebar.download_button(
             else: st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
 
         except Exception as e: st.error(f"❌ Ada ralat: {e}")
-
 
 
 
