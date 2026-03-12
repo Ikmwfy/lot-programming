@@ -117,10 +117,6 @@ if check_password():
         with open("ICON.jpeg", "rb") as f:
             icon_base64 = base64.b64encode(f.read()).decode()
 
-        # Mengambil data daripada sesi log masuk
-        nama = st.session_state.get("user_nama", "Malfoy")
-        role = st.session_state.get("user_role", "Student")
-
         st.sidebar.markdown(f"""
             <div class="sidebar-profile-container">
                 <video autoplay loop muted playsinline class="sidebar-video-bg">
@@ -130,8 +126,8 @@ if check_password():
                     <div class="icon-wrapper">
                         <img src="data:image/png;base64,{icon_base64}" class="sidebar-icon">
                     </div>
-                    <h3 style="color: white; margin-top: 10px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-weight: 700; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">Hai, {nama}!</h3>
-                    <p style="color: #00d4ff; font-size: 0.9em; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;">{role}</p>
+                    <h3 style="color: white; margin-top: 10px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; font-weight: 700; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">Hai, Malfoy!</h3>
+                    <p style="color: #00d4ff; font-size: 0.9em; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;">Student</p>
                 </div>
             </div>
             
@@ -188,7 +184,80 @@ if check_password():
             </style>
         """, unsafe_allow_html=True)
     except Exception as e:
-        st.sidebar.error(f"⚠️ Masalah profil: Pastikan fail BACKGROUND.mp4 & ICON.jpeg ada di GitHub.")
+        st.sidebar.error(f"⚠️ Masalah profil: Pastikan fail BACKGROUND.mp4 & ICON.png ada di GitHub.")
+
+    # --- ⚙️ FUNGSI SIDEBAR TAMBAHAN ---
+    st.sidebar.markdown("---")
+    
+    # 1. Butang Tukar Kata Laluan
+    if st.sidebar.button("🔐 Tukar Kata Laluan", use_container_width=True):
+        reset_password_dialog()
+        
+    # 2. Butang Log Keluar
+    if st.sidebar.button("🚪 Log Keluar", use_container_width=True):
+        del st.session_state["password_correct"]
+        st.rerun()
+
+    # --- HEADER VISUAL BERGERAK (VIDEO) ---
+    if os.path.exists(video_path):
+        video_base64 = get_video_base64(video_path)
+        
+        logo_base64 = ""
+        if os.path.exists(logo_path):
+            with open(logo_path, "rb") as image_file:
+                logo_base64 = base64.b64encode(image_file.read()).decode()
+
+        st.markdown(f"""
+            <style>
+            .header-container {{
+                position: relative; 
+                width: 110%; 
+                height: 180px; 
+                overflow: hidden;
+                border-radius: 15px; 
+                margin-bottom: 25px; 
+                margin-left: -50px; 
+                background-color: #000;
+                display: flex;
+                align-items: center;
+            }}
+            .video-bg {{
+                position: absolute; 
+                top: 50%; 
+                left: 0; 
+                min-width: 100%;
+                min-height: 100%; 
+                width: auto; 
+                height: auto; 
+                z-index: 0;
+                transform: translateY(-50%); 
+                opacity: 0.6;
+            }}
+            .header-content {{
+                position: relative; z-index: 1; display: flex; align-items: center;
+                padding: 20px; width: 100%;
+            }}
+            .header-logo {{ width: 100px; margin-right: 25px; filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.5)); }}
+            .header-text-container {{ color: white; }}
+            .header-title-main {{ font-size: 38px; font-weight: 800; text-shadow: 2px 2px 8px rgba(0,0,0,0.8); margin: 0; }}
+            .header-subtitle-main {{ font-size: 16px; opacity: 0.9; margin: 0; }}
+            </style>
+            
+            <div class="header-container">
+                <video autoplay loop muted playsinline class="video-bg">
+                    <source src="data:video/mp4;base64,{video_base64}" type="video/mp4">
+                </video>
+                <div class="header-content">
+                    <img src="data:image/png;base64,{logo_base64}" class="header-logo">
+                    <div class="header-text-container">
+                        <h1 class="header-title-main">SISTEM SURVEY LOT RUMAH</h1>
+                        <p class="header-subtitle-main">Politeknik Ungku Omar | Jabatan Kejuruteraan Awam</p>
+                    </div>
+                </div>
+            </div>
+        """, unsafe_allow_html=True)
+    else:
+        st.error("⚠️ Fail 'VIDEO.mp4' tidak dijumpai untuk paparan header.")
     
     st.markdown("<hr style='border: 1px solid #eee; margin-top: 0px;'>", unsafe_allow_html=True)
 
@@ -409,12 +478,6 @@ if check_password():
             else: st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
 
         except Exception as e: st.error(f"❌ Ada ralat: {e}")
-
-
-
-
-
-
 
 
 
