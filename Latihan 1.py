@@ -304,6 +304,7 @@ if check_password():
 
     # ================== BACA DATA ==================
     # ================== BACA DATA ==================
+    if uploaded_file is not None:
         
         try:
             df = pd.read_csv(uploaded_file)
@@ -479,9 +480,6 @@ if check_password():
             else: st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
 
         except Exception as e: st.error(f"❌ Ada ralat: {e}")
-
-
-
 
 
 
