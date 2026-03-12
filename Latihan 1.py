@@ -294,10 +294,16 @@ if check_password():
     dist_offset = st.sidebar.slider("Jarak Label Stesen ke Luar", 0.5, 5.0, 1.5)
 
     # ================== BACA DATA ==================
-  # ================== BACA DATA ==================
+    # ================== BACA DATA ==================
     if uploaded_file is not None:
+        # 1. Pastikan session state diaktifkan
+        if st.session_state.show_map == False:
+            st.session_state.show_map = True
+            st.rerun() # Ini kunci supaya peta terus keluar tanpa perlu klik manual
+        
         try:
             df = pd.read_csv(uploaded_file)
+            # ... (selebihnya kod anda kekal sama) ...
             
             if all(col in df.columns for col in ['STN', 'E', 'N']):
                 
@@ -313,70 +319,162 @@ if check_password():
                 area = poly_geom.area
 
                 # --- 💾 EKSPORT QGIS ---
+              # --- 💾 EKSPORT QGIS (DENGAN LAYER LENGKAP) ---
                 st.sidebar.markdown("---")
                 st.sidebar.subheader("💾 Eksport Data")
                 
                 features = []
-                # ... (Kod bahagian features anda kekal sama) ...
+                
+                # 1. Layer Polygon (Kawasan)
                 features.append({
                     "type": "Feature",
                     "geometry": mapping(poly_ll),
-                    "properties": {"Layer": "Lot_Kawasan", "Area_sqm": round(area, 2), "Perimeter": round(line_geom.length, 2)}
+                    "properties": {
+                        "Layer": "Lot_Kawasan",
+                        "Area_sqm": round(area, 2),
+                        "Perimeter": round(line_geom.length, 2)
+                    }
                 })
                 
+                # 2. Layer Line (Sempadan dengan Bearing & Jarak)
                 for i in range(len(df)):
                     p1, p2 = df.iloc[i], df.iloc[(i + 1) % len(df)]
                     dE, dN = p2['E'] - p1['E'], p2['N'] - p1['N']
-                    dist, bear = np.sqrt(dE**2 + dN**2), (np.degrees(np.arctan2(dE, dN)) + 360) % 360
+                    dist = np.sqrt(dE**2 + dN**2)
+                    bear = (np.degrees(np.arctan2(dE, dN)) + 360) % 360
+                    
                     line_seg = LineString([(p1['lon'], p1['lat']), (p2['lon'], p2['lat'])])
                     features.append({
                         "type": "Feature",
                         "geometry": mapping(line_seg),
-                        "properties": {"Layer": "Sempadan", "From_Stn": int(p1['STN']), "To_Stn": int(p2['STN']), "Bearing": format_dms(bear), "Distance": round(dist, 3)}
+                        "properties": {
+                            "Layer": "Sempadan",
+                            "From_Stn": int(p1['STN']),
+                            "To_Stn": int(p2['STN']),
+                            "Bearing": format_dms(bear),
+                            "Distance": round(dist, 3)
+                        }
                     })
                 
+                # 3. Layer Point (Stesen/Batu Sempadan)
                 for i in range(len(df)):
                     pt = Point(df.iloc[i]['lon'], df.iloc[i]['lat'])
                     features.append({
                         "type": "Feature",
                         "geometry": mapping(pt),
-                        "properties": {"Layer": "Batu_Sempadan", "label": str(int(df.iloc[i]['STN'])), "Station_ID": int(df.iloc[i]['STN']), "Easting": round(df.iloc[i]['E'], 3), "Northing": round(df.iloc[i]['N'], 3)}
+                        "properties": {
+                            "Layer": "Batu_Sempadan",
+                            "label": str(int(df.iloc[i]['STN'])), # Tambahan atribut label
+                            "Station_ID": int(df.iloc[i]['STN']),
+                            "Easting": round(df.iloc[i]['E'], 3),
+                            "Northing": round(df.iloc[i]['N'], 3)
+                        }
                     })
 
                 geojson_dict = {"type": "FeatureCollection", "features": features}
-                st.sidebar.download_button(label="🚀 Export to QGIS (.geojson)", data=json.dumps(geojson_dict), file_name="survey_lot_qgis.geojson", mime="application/json", use_container_width=True)
+                
+                st.sidebar.download_button(
+                    label="🚀 Export to QGIS (.geojson)",
+                    data=json.dumps(geojson_dict),
+                    file_name="survey_lot_qgis.geojson",
+                    mime="application/json",
+                    use_container_width=True
+                )
 
                 st.markdown("---")
 
-                # --- PAPARAN PETA ATAU PLOT ---
                 if show_interactive_map:
-                    # [Kod Folium anda...]
-                    # Pastikan tiada st.rerun() di sini
+                    # --- MOD PETA INTERAKTIF ---
                     google_map_url = 'https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}'
                     if map_provider == "Standard Map":
                         google_map_url = 'https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}'
 
                     m = folium.Map(location=[df['lat'].mean(), df['lon'].mean()], zoom_start=20, max_zoom=22, tiles=google_map_url, attr='Google')
-                    # ... (selebihnya kod folium anda) ...
-                    st_folium(m, width=1400, height=600, key="peta_survey")
+                    points_map = [[r['lat'], r['lon']] for _, r in df.iterrows()]
+                    
+                    perimeter = line_geom.length
+                    lot_info = f"<b>INFO LOT</b><br>Luas: {area:.2f} m²<br>Perimeter: {perimeter:.2f} m<br>Bilangan Stesen: {len(df)}"
+                
+                    # Poligon dengan Tooltip (Hover effect)
+                    folium.Polygon(
+                        locations=points_map, 
+                        color=line_color, 
+                        weight=3, 
+                        fill=True, 
+                        fill_color=poly_color, 
+                        fill_opacity=poly_opacity,
+                        popup=folium.Popup(lot_info, max_width=200),
+                        tooltip="Klik untuk info lot penuh" # Hover pada kawasan lot
+                    ).add_to(m)
+                    
+                    for i in range(len(df)):
+                        p1, p2 = df.iloc[i], df.iloc[(i + 1) % len(df)]
+                        dE, dN = p2['E'] - p1['E'], p2['N'] - p1['N']
+                        dist, bear = np.sqrt(dE**2 + dN**2), (np.degrees(np.arctan2(dE, dN)) + 360) % 360
+                        angle = -np.degrees(np.arctan2(p2['lat'] - p1['lat'], p2['lon'] - p1['lon']))
+                        if angle > 90: angle -= 180
+                        elif angle < -90: angle += 180
+                        
+                        stn_info = f"<b>STESEN {int(p1['STN'])}</b><br>E: {p1['E']:.3f}<br>N: {p1['N']:.3f}"
+                        
+                        v_offset = -20 if dN >= 0 else -10
+                        folium.Marker([ (p1['lat'] + p2['lat']) / 2, (p1['lon'] + p2['lon']) / 2],
+                            icon=folium.DivIcon(html=f'''<div style="transform: rotate({angle}deg); text-align: center; width: 160px; margin-left: -80px; margin-top: {v_offset}px;">
+                                <div style="font-size: {label_size_data}pt; color: white; text-shadow: 2px 2px 3px black; font-weight: bold;">{format_dms(bear)}<br><span style="color: #FFD700;">{dist:.2f}m</span></div></div>''')).add_to(m)
+                        
+                        # Marker Stesen dengan Tooltip (Hover effect)
+                        folium.Marker(
+                            [p1['lat'], p1['lon']], 
+                            popup=folium.Popup(stn_info, max_width=150),
+                            tooltip=f"Stesen {int(p1['STN'])}", # Hover pada batu sempadan
+                            icon=folium.DivIcon(html=f'''<div style="background-color: white; border: 2px solid red; border-radius: 50%; width: {label_size_stn}px; height: {label_size_stn}px; display: flex; align-items: center; justify-content: center; font-size: {label_size_stn*0.6}px; font-weight: bold; color: black; margin-left: -{label_size_stn/2}px; margin-top: -{label_size_stn/2}px; box-shadow: 1px 1px 3px rgba(0,0,0,0.5);">{int(p1["STN"])}</div>''')
+                        ).add_to(m)
+
+                    if show_luas_label:
+                        folium.Marker([df['lat'].mean(), df['lon'].mean()], icon=folium.DivIcon(html=f'<div style="font-size: {label_size_luas}pt; color: #00FF00; text-shadow: 3px 3px 5px black; font-weight: 900; width: 250px; text-align: center; margin-left: -125px;">{area:.2f} m²</div>')).add_to(m)
+                    st_folium(
+                        m, 
+                        width=1400, 
+                        height=600, 
+                        returned_objects=[], 
+                        key="peta_survey"
+                    )
 
                 else:
                     # --- MOD MATPLOTLIB ---
-                    # [Kod Matplotlib anda...]
                     if plot_theme == "Dark Mode": bg_color, grid_color = "#121212", "#555555"
                     elif plot_theme == "Blueprint": bg_color, grid_color = "#003366", "#004080"
                     else: bg_color, grid_color = "#ffffff", "#aaaaaa"
-                    # ... (selebihnya kod plot anda) ...
+
                     fig, ax = plt.subplots(figsize=(10, 8))
-                    st.pyplot(fig)
+                    fig.patch.set_facecolor(bg_color); ax.set_facecolor(bg_color)
+                    ax.plot(*(line_geom.xy), linewidth=2, color=line_color, zorder=4)
+                    ax.fill(*(poly_geom.exterior.xy), color=poly_color, alpha=poly_opacity)
 
-            else: 
-                st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
+                    if show_bg_grid:
+                        ax.grid(True, color=grid_color, linestyle='--', alpha=0.5)
+                        ax.xaxis.set_major_locator(plt.MultipleLocator(grid_interval))
+                        ax.yaxis.set_major_locator(plt.MultipleLocator(grid_interval))
+                    else: ax.axis('off')
 
-        except Exception as e: 
-            st.error(f"❌ Ada ralat: {e}")
+                    if show_luas_label:
+                        ax.text(centroid_m.x, centroid_m.y, f"{area:.2f} m²", fontsize=label_size_luas, fontweight='bold', color='darkgreen', ha='center', bbox=dict(boxstyle='round,pad=0.3', fc='white', alpha=0.9, ec='green'), zorder=10)
 
+                    for i in range(len(df)):
+                        p1, p2 = df.iloc[i], df.iloc[(i + 1) % len(df)]
+                        dE, dN = p2['E'] - p1['E'], p2['N'] - p1['N']
+                        dist, bear = np.sqrt(dE**2 + dN**2), (np.degrees(np.arctan2(dE, dN)) + 360) % 360
+                        txt_angle = np.degrees(np.arctan2(dN, dE))
+                        if txt_angle > 90: txt_angle -= 180
+                        elif txt_angle < -90: txt_angle += 180
+                        ax.text((p1['E']+p2['E'])/2, (p1['N']+p2['N'])/2, f"{format_dms(bear)}\n{dist:.2f}m", fontsize=label_size_data, color='brown', fontweight='bold', ha='center', rotation=txt_angle)
+                        ax.scatter(p1['E'], p1['N'], color='white', edgecolor='red', s=300, zorder=5, linewidth=2)
+                        ax.text(p1['E'], p1['N'], str(int(p1['STN'])), fontsize=label_size_stn/2, color='black', fontweight='bold', ha='center', va='center', zorder=6)
+                    ax.set_aspect("equal"); st.pyplot(fig)
 
+            else: st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
+
+        except Exception as e: st.error(f"❌ Ada ralat: {e}")
 
 
 
