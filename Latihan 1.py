@@ -304,11 +304,10 @@ if check_password():
 
     # ================== BACA DATA ==================
     # ================== BACA DATA ==================
-    if uploaded_file is not None:
-        # 1. Pastikan session state diaktifkan
-        if st.session_state.show_map == False:
-            st.session_state.show_map = True
-            st.rerun() # Ini kunci supaya peta terus keluar tanpa perlu klik manual
+    # Letak di bahagian atas skrip atau sebelum pembacaan fail
+    if uploaded_file is not None and "first_load" not in st.session_state:
+        st.session_state.show_map = True
+        st.session_state.first_load = True
         
         try:
             df = pd.read_csv(uploaded_file)
@@ -484,6 +483,7 @@ if check_password():
             else: st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
 
         except Exception as e: st.error(f"❌ Ada ralat: {e}")
+
 
 
 
