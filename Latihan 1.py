@@ -183,6 +183,18 @@ if check_password():
     except Exception as e:
         st.sidebar.error(f"⚠️ Masalah profil: Pastikan fail BACKGROUND.mp4 & ICON.png ada di GitHub.")
 
+    # --- ⚙️ FUNGSI SIDEBAR TAMBAHAN ---
+    st.sidebar.markdown("---")
+    
+    # 1. Butang Tukar Kata Laluan
+    if st.sidebar.button("🔐 Tukar Kata Laluan", use_container_width=True):
+        reset_password_dialog()
+        
+    # 2. Butang Log Keluar
+    if st.sidebar.button("🚪 Log Keluar", use_container_width=True):
+        del st.session_state["password_correct"]
+        st.rerun()
+
     # --- HEADER VISUAL BERGERAK (VIDEO) ---
     if os.path.exists(video_path):
         video_base64 = get_video_base64(video_path)
@@ -463,6 +475,7 @@ if check_password():
             else: st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
 
         except Exception as e: st.error(f"❌ Ada ralat: {e}")
+
 
 
 
