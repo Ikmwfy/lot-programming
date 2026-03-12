@@ -70,33 +70,35 @@ def check_password():
             """, unsafe_allow_html=True)
 
         _, col_mid, _ = st.columns([1, 1.5, 1])
+        def check_password():
+    if "password_correct" not in st.session_state:
+        # ... (Biarkan kod video background anda di sini) ...
+        
         with col_mid:
-            # --- KOTAK LOGIN SOLID ---
-            st.markdown("""
-                <div style="background-color: #ffffff; padding: 30px; border-radius: 15px; 
-                            box-shadow: 0 8px 20px rgba(0,0,0,0.3); margin-top: 50px;">
-                    <h2 style='text-align: center; color: #333;'>Survey Lot Rumah</h2>
-            """, unsafe_allow_html=True)
+            st.markdown("""<div style="background-color: #ffffff; padding: 30px; border-radius: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.3); margin-top: 50px;">
+                        <h2 style='text-align: center; color: #333;'>Survey Lot Rumah</h2>""", unsafe_allow_html=True)
             
             with st.form("login_form"):
                 user_id = st.text_input("👤 Masukkan ID:", key="user_id")
                 password = st.text_input("🔑 Masukkan Kata Laluan:", type="password", key="user_pass")
-                st.markdown("<br>", unsafe_allow_html=True)
-                
                 submit_button = st.form_submit_button("Log Masuk", use_container_width=True)
                 
                 if submit_button:
-                    if user_id == "67" and password == "ikmalkacak":
+                    # Database pengguna
+                    users = {
+                        "67": {"pass": "ikmalkacak", "nama": "Malfoy", "role": "Student"},
+                        "68": {"pass": "hazrulkacak", "nama": "Hazrul", "role": "Student"},
+                        "69": {"pass": "aniqkacak", "nama": "Aniq", "role": "Student"}
+                    }
+                    
+                    if user_id in users and password == users[user_id]["pass"]:
                         st.session_state["password_correct"] = True
+                        st.session_state["user_nama"] = users[user_id]["nama"]
+                        st.session_state["user_role"] = users[user_id]["role"]
                         st.rerun()
                     else:
                         st.error("😕 ID atau Kata Laluan salah.")
-            
-            if st.button("❓ Lupa Kata Laluan?", use_container_width=True):
-                reset_password_dialog()
-                
-            st.markdown("</div>", unsafe_allow_html=True) # Tutup div kotak login
-            
+            # ... (selebihnya kod login anda) ...
         return False
     return True
     
@@ -475,6 +477,7 @@ if check_password():
             else: st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
 
         except Exception as e: st.error(f"❌ Ada ralat: {e}")
+
 
 
 
