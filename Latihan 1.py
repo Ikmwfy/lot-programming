@@ -440,7 +440,7 @@ if check_password():
                     st_folium(
                         m, 
                         width=1400, 
-                        height=600, 
+                        height=800, 
                         returned_objects=[], 
                         key="peta_survey"
                     )
@@ -480,6 +480,7 @@ if check_password():
             else: st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
 
         except Exception as e: st.error(f"❌ Ada ralat: {e}")
+
 
 
 
