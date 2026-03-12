@@ -352,6 +352,7 @@ if check_password():
                         "geometry": mapping(pt),
                         "properties": {
                             "Layer": "Batu_Sempadan",
+                            "label": str(int(df.iloc[i]['STN'])), # Tambahan atribut label
                             "Station_ID": int(df.iloc[i]['STN']),
                             "Easting": round(df.iloc[i]['E'], 3),
                             "Northing": round(df.iloc[i]['N'], 3)
@@ -462,6 +463,7 @@ if check_password():
             else: st.error("❌ Kolum STN, E, N tak jumpa dalam CSV!")
 
         except Exception as e: st.error(f"❌ Ada ralat: {e}")
+
 
 
 
